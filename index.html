@@ -301,7 +301,7 @@ button:active{transform:scale(.96)}
   </div>
 
   <!-- 画像共有(共有メニューが使えないとき) -->
-  <div class="overlay" id="shareModal">
+  <div class="overlay" id="shareModal" style="z-index:70">
     <div class="modal">
       <h3>結果画像</h3>
       <img class="share-prev" id="sharePrev" alt="結果画像">
@@ -329,6 +329,7 @@ button:active{transform:scale(.96)}
       <div class="asm-title">全身骨格 完成!</div>
       <div class="asm-stage" id="asmStage"></div>
       <div class="asm-name" id="asmName"></div>
+      <div id="asmShare" class="share-row" style="margin-top:-6px"></div>
       <button class="btn-primary" onclick="sUI();document.getElementById('assembly').classList.remove('on')">とじる</button>
     </div>
   </div>
@@ -1014,6 +1015,41 @@ function showAssembly(sp){
     cv.style.filter='drop-shadow(0 4px 6px rgba(0,0,0,.6))';const a=rnd()*Math.PI*2;cv.style.transform=`translate(${Math.cos(a)*W}px,${Math.sin(a)*H}px) rotate(${(rnd()-0.5)*90}deg)`;cv.style.opacity=0;
     st.appendChild(cv);setTimeout(()=>{cv.style.opacity=1;cv.style.transform='none';tn({f:300+k*80,f2:200+k*60,dur:0.15,g:0.3})},250+k*260)});
   setTimeout(()=>{sFanfare(true);confetti(140)},250+4*260+300);
+  // 共有の準備
+  const rec=(dexData[sp]&&dexData[sp].parts)||{},vals=PARTS.map((_,k)=>rec[k]||0),avg=Math.round(vals.reduce((a,b)=>a+b,0)/4);
+  const done=progressCounts().done,s0=SPECIES[sp];
+  ASM={sp,avg,done,text:`化石採掘で${'★'.repeat(s0.r)}${s0.n}の全身骨格を完成させた!🦴\n4パーツ平均${avg}点 ・ 完成${done}/20体\n#化石採掘`,blob:null,url:null};
+  const box=document.getElementById('asmShare');
+  box.innerHTML=`<button class="btn-img" id="btnAsmShare"><svg viewBox="0 0 24 24" fill="none" stroke="#2b1806" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/></svg>画像で共有</button><a class="btn-x" href="${xIntentURL(ASM.text)}" target="_blank" rel="noopener" onclick="sUI()">${X_SVG}Xに投稿</a>`;
+  document.getElementById('btnAsmShare').onclick=()=>{sUI();shareWith(ASM)};
+  const tok=ASM;makeAsmImage(sp,avg,done).then(cv=>{if(ASM!==tok)return;ASM.url=cv.toDataURL('image/png');cv.toBlob(b=>{if(ASM===tok)ASM.blob=b},'image/png')}).catch(reportErr);
+}
+let ASM=null;
+async function makeAsmImage(sp,avg,done){
+  try{if(document.fonts){await Promise.race([Promise.all([document.fonts.load('40px "Dela Gothic One"','化石採掘全身骨格完成'),document.fonts.load('700 30px "M PLUS Rounded 1c"','平均点')]),new Promise(r=>setTimeout(r,1500))])}}catch(e){}
+  const W=1200,H=675,cv=document.createElement('canvas');cv.width=W;cv.height=H;const c=cv.getContext('2d');
+  const DELA='"Dela Gothic One","Hiragino Sans",sans-serif',MPR='"M PLUS Rounded 1c","Hiragino Sans",sans-serif',s0=SPECIES[sp];
+  let g=c.createLinearGradient(0,0,0,H);g.addColorStop(0,'#33261c');g.addColorStop(1,'#120d0a');c.fillStyle=g;c.fillRect(0,0,W,H);
+  c.globalAlpha=0.18;for(let k=0;k<6;k++){c.strokeStyle=k%2?'#c8a070':'#8a6a4a';c.lineWidth=3;c.beginPath();for(let x=0;x<=W;x+=40){const y=H*0.62+k*42+Math.sin(x/170+k)*10;x?c.lineTo(x,y):c.moveTo(x,y)}c.stroke()}c.globalAlpha=1;
+  // 骨格パネル
+  const px=40,py=40,pw=700,ph=595;c.save();c.beginPath();c.roundRect?c.roundRect(px,py,pw,ph,28):c.rect(px,py,pw,ph);c.clip();
+  g=c.createRadialGradient(px+pw/2,py+ph*0.45,40,px+pw/2,py+ph/2,pw*0.7);g.addColorStop(0,'#3a4847');g.addColorStop(1,'#1a2022');c.fillStyle=g;c.fillRect(px,py,pw,ph);
+  g=c.createRadialGradient(px+pw/2,py+ph*0.45,0,px+pw/2,py+ph*0.45,pw*0.5);g.addColorStop(0,'rgba(255,220,150,.18)');g.addColorStop(1,'rgba(255,220,150,0)');c.fillStyle=g;c.fillRect(px,py,pw,ph);
+  const lay=[[0,0.22,0.33,0.36],[1,0.55,0.38,0.5],[2,0.42,0.66,0.3],[3,0.72,0.64,0.36]];
+  c.shadowColor='rgba(0,0,0,.6)';c.shadowBlur=14;c.shadowOffsetY=6;
+  for(const [part,x,y,sz] of lay){const pc=partCanvas(sp,part,256),z=sz*pw;c.drawImage(pc,px+x*pw-z/2,py+y*ph-z/2,z,z)}
+  c.restore();c.strokeStyle='rgba(240,180,76,.6)';c.lineWidth=3;c.beginPath();c.roundRect?c.roundRect(px,py,pw,ph,28):c.rect(px,py,pw,ph);c.stroke();
+  // 文字
+  const X0=780,TW=380;c.textAlign='left';c.textBaseline='alphabetic';
+  c.font=`36px ${DELA}`;g=c.createLinearGradient(0,60,0,105);g.addColorStop(0,'#fff3d0');g.addColorStop(1,'#e59a2e');c.fillStyle=g;c.fillText('化石採掘',X0,100);
+  c.font=`46px ${DELA}`;g=c.createLinearGradient(0,140,0,200);g.addColorStop(0,'#fff6dc');g.addColorStop(1,'#f0b44c');c.fillStyle=g;c.fillText('全身骨格',X0,190);c.fillText('完成!',X0,248);
+  c.fillStyle='#f0b44c';c.font=`700 30px ${MPR}`;c.fillText('★'.repeat(s0.r)+'☆'.repeat(4-s0.r),X0,315);
+  fitFont(c,s0.n,TW,44,DELA);c.fillStyle='#f4ece0';c.fillText(s0.n,X0,375);
+  c.font=`700 26px ${MPR}`;c.fillStyle='#b9aa98';c.fillText('4パーツ平均',X0,440);
+  c.font=`80px ${DELA}`;c.fillStyle='#f2e5cb';c.fillText(String(avg),X0,525);const aw=c.measureText(String(avg)).width;c.font=`30px ${DELA}`;c.fillText('点',X0+aw+6,525);
+  c.font=`800 26px ${MPR}`;c.fillStyle='#ffd27a';c.fillText(`🦴 完成 ${done}/20体`,X0,575);
+  {const ft='#化石採掘  pani1208.github.io/kaseki-saikutsu';fitFont(c,ft,W-X0-20,20,MPR);c.fillStyle='#8f8070';c.fillText(ft,X0,628)}
+  return cv;
 }
 
 // ================= 図鑑 =================
@@ -1042,7 +1078,7 @@ function shareText(){
   return `化石採掘で${what}を${SHARE.score}点(${rankOf(SHARE.score)}ランク)で掘り出した!🦴`+(SHARE.pos?`\n綺麗な化石ランキング★${sp.r}で${SHARE.pos}位🏆`:'')+`\n#化石採掘`;
 }
 const X_SVG='<svg viewBox="0 0 24 24" fill="#fff"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>';
-function xIntentURL(){return 'https://x.com/intent/tweet?text='+encodeURIComponent(shareText())+'&url='+encodeURIComponent(SITE_URL)}
+function xIntentURL(t){return 'https://x.com/intent/tweet?text='+encodeURIComponent(t||shareText())+'&url='+encodeURIComponent(SITE_URL)}
 function renderShare(){
   const slot=document.getElementById('rShareSlot');if(!SHARE){slot.innerHTML='';return}
   slot.innerHTML=`<div class="share-row"><button class="btn-img" id="btnImgShare"><svg viewBox="0 0 24 24" fill="none" stroke="#2b1806" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/></svg>画像で共有</button><a class="btn-x" href="${xIntentURL()}" target="_blank" rel="noopener" onclick="sUI()">${X_SVG}Xに投稿</a></div>`;
@@ -1087,14 +1123,17 @@ async function makeShareImage(){
 async function shareImage(){
   sUI();if(!SHARE)return;
   if(!SHARE.url){const cv=await makeShareImage();SHARE.url=cv.toDataURL('image/png')}
-  const text=shareText()+'\n'+SITE_URL;
+  SHARE.text=shareText();shareWith(SHARE);
+}
+async function shareWith(o){
+  if(!o.url)return;
   try{
-    if(SHARE.blob&&navigator.canShare){const f=new File([SHARE.blob],'kaseki-saikutsu.png',{type:'image/png'});
-      if(navigator.canShare({files:[f]})){await navigator.share({files:[f],text});return}}
+    if(o.blob&&navigator.canShare){const f=new File([o.blob],'kaseki-saikutsu.png',{type:'image/png'});
+      if(navigator.canShare({files:[f]})){await navigator.share({files:[f],text:o.text+'\n'+SITE_URL});return}}
   }catch(e){if(e&&e.name==='AbortError')return}
   // 共有メニューが使えないときは、画像を表示して保存してもらう
-  document.getElementById('sharePrev').src=SHARE.url;
-  document.getElementById('shareXSlot').innerHTML=`<a class="btn-x" href="${xIntentURL()}" target="_blank" rel="noopener" onclick="sUI()">${X_SVG}Xの投稿画面を開く</a>`;
+  document.getElementById('sharePrev').src=o.url;
+  document.getElementById('shareXSlot').innerHTML=`<a class="btn-x" href="${xIntentURL(o.text)}" target="_blank" rel="noopener" onclick="sUI()">${X_SVG}Xの投稿画面を開く</a>`;
   document.getElementById('shareModal').classList.add('on');
 }
 
