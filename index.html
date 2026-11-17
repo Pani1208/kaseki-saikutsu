@@ -166,10 +166,71 @@ button:active{transform:scale(.96)}
 .how .ic{flex:0 0 46px;height:46px;border-radius:12px;background:#1a1410;display:grid;place-items:center}
 .how .ic svg{width:32px;height:32px}
 .how b{color:var(--cream)}
-.asm-stage{position:relative;width:100%;aspect-ratio:1.35;border-radius:16px;background:radial-gradient(circle at 50% 45%,#34403f,#1c2223);overflow:hidden;box-shadow:inset 0 0 30px rgba(0,0,0,.6)}
-.asm-stage canvas{position:absolute;transition:transform .7s cubic-bezier(.2,.9,.3,1.15),opacity .4s}
-.asm-title{font-family:"Dela Gothic One";font-size:24px;text-align:center;background:linear-gradient(180deg,#fff3d0,#f0b44c);-webkit-background-clip:text;background-clip:text;color:transparent}
-.asm-name{text-align:center;font-weight:800;color:var(--cream)}
+/* 全身骨格(全画面演出) */
+.asm-full{position:absolute;inset:0;z-index:62;background:radial-gradient(90% 60% at 50% 40%,#211a14,#060403);opacity:0;pointer-events:none;transition:opacity .45s;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.asm-full.on{opacity:1;pointer-events:auto}
+#asmFx{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.asm-inner{position:relative;width:100%;padding:16px 16px 22px;display:flex;flex-direction:column;align-items:center;gap:8px}
+.asm-inner.quake{animation:quake .6s}
+@keyframes quake{0%,100%{transform:none}10%{transform:translate(-9px,4px)}20%{transform:translate(8px,-6px)}30%{transform:translate(-7px,-3px)}40%{transform:translate(6px,5px)}50%{transform:translate(-5px,2px)}60%{transform:translate(4px,-3px)}70%{transform:translate(-3px,2px)}85%{transform:translate(2px,-1px)}}
+.asm-title{font-family:"Dela Gothic One";font-size:36px;text-align:center;background:linear-gradient(180deg,#fff6dc,#f0b44c 60%,#d98f2b);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-stroke:1.5px #4a2810;filter:drop-shadow(0 4px 0 #2a160a) drop-shadow(0 0 22px rgba(255,200,90,.45));opacity:0;transform:scale(2.6);min-height:46px}
+.asm-title.on{animation:titlein .5s cubic-bezier(.3,1.6,.5,1) forwards}
+@keyframes titlein{0%{opacity:0;transform:scale(2.6)}60%{opacity:1}100%{opacity:1;transform:scale(1)}}
+.asm-stars{color:var(--amber);letter-spacing:4px;font-size:18px;opacity:0;transition:opacity .4s;min-height:22px}
+.asm-stars.on{opacity:1}
+.asm-stage{position:relative;width:100%;aspect-ratio:1.3}
+.asm-stage canvas{position:absolute;opacity:0;transition:transform .42s cubic-bezier(.55,.06,.68,.19),opacity .2s,filter .6s;filter:drop-shadow(0 6px 8px rgba(0,0,0,.7))}
+.asm-spot{position:absolute;inset:-14% -6%;background:radial-gradient(closest-side,rgba(255,222,160,.26),rgba(255,222,160,.08) 60%,rgba(255,222,160,0));opacity:0;transition:opacity .7s;pointer-events:none}
+.asm-stage.lit .asm-spot{opacity:1}
+.asm-stage.glow canvas{filter:drop-shadow(0 0 8px rgba(255,225,150,.95)) drop-shadow(0 0 24px rgba(255,190,80,.6)) brightness(1.12)}
+.asm-stage.thud{animation:thud .26s}
+@keyframes thud{0%{transform:none}35%{transform:translateY(7px) scaleY(.985)}100%{transform:none}}
+.asm-stage.shiver{animation:shiver 1s}
+@keyframes shiver{0%,100%{transform:none}8%,24%,40%,56%,72%{transform:translate(-5px,1px) rotate(-1.2deg)}16%,32%,48%,64%,80%{transform:translate(5px,-1px) rotate(1.2deg)}}
+.asm-roar{position:absolute;left:0;right:0;top:34%;text-align:center;font-family:"Dela Gothic One";font-size:46px;color:#fff;-webkit-text-stroke:2px #5a1d0a;text-shadow:0 4px 0 #2a0e05,0 0 30px rgba(255,120,50,.8);opacity:0;pointer-events:none}
+.asm-roar.on{animation:roar 1.3s ease-out forwards}
+@keyframes roar{0%{opacity:0;transform:scale(.3) rotate(-7deg)}14%{opacity:1;transform:scale(1.3) rotate(-7deg)}28%{transform:scale(1) rotate(-7deg)}78%{opacity:1}100%{opacity:0;transform:scale(1.12) rotate(-7deg)}}
+.asm-name{font-family:"Dela Gothic One";font-size:26px;text-align:center;opacity:0;transform:translateY(8px);transition:all .4s}
+.asm-name.on{opacity:1;transform:none}
+.asm-count{font-weight:800;color:var(--sub);font-size:15px;opacity:0;transition:opacity .4s}
+.asm-count.on{opacity:1}
+.asm-count b{display:inline-block;font-family:"Dela Gothic One";font-size:24px;color:var(--amber2);margin:0 2px}
+.asm-count b.pop{animation:cpop .6s cubic-bezier(.3,1.6,.5,1)}
+@keyframes cpop{0%{transform:scale(1)}40%{transform:scale(2);color:#fff}100%{transform:scale(1)}}
+.asm-after{display:flex;flex-direction:column;gap:10px;width:100%;opacity:0;pointer-events:none;transition:opacity .4s;margin-top:6px}
+.asm-after.on{opacity:1;pointer-events:auto}
+.asm-skip{position:absolute;top:14px;left:14px;z-index:3;font-size:13px;font-weight:800;color:var(--sub);padding:8px 14px;border-radius:99px;background:rgba(255,255,255,.07);border:1px solid var(--line)}
+.asm-skip.hide{display:none}
+/* 結果画面のパーツ枠 */
+.rparts{display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:6px}
+.rparts-row{display:flex;gap:8px}
+.rp{position:relative;width:56px;height:56px;border-radius:12px;background:#15100d;border:1px solid var(--line);display:grid;place-items:center}
+.rp img{width:88%;height:88%;object-fit:contain;filter:drop-shadow(0 2px 2px rgba(0,0,0,.6))}
+.rp .q{font-family:"Dela Gothic One";color:#3a3029;font-size:18px}
+.rp.got{background:#2c3335}
+.rp.new{border-color:var(--amber);box-shadow:0 0 0 1px var(--amber),0 0 18px rgba(255,200,90,.6);animation:slotin .55s cubic-bezier(.3,1.7,.5,1)}
+@keyframes slotin{0%{transform:scale(1.9) rotate(-12deg);opacity:0}100%{transform:none;opacity:1}}
+.rp em{position:absolute;bottom:-15px;font-size:10px;color:var(--sub);font-style:normal;font-weight:700}
+.rparts-msg{margin-top:10px;font-size:14px;font-weight:800;color:var(--amber2);text-align:center}
+.rparts-msg.big{font-family:"Dela Gothic One";font-weight:400;font-size:18px;color:#fff3d0;text-shadow:0 0 14px rgba(255,200,90,.7);animation:cpop .6s}
+/* 博物館 */
+#s-museum{padding:14px 14px 30px;gap:12px;background:repeating-linear-gradient(90deg,rgba(255,255,255,.018) 0 1px,rgba(0,0,0,0) 1px 64px),linear-gradient(180deg,#241c16,#140f0c 60%,#0e0a08)}
+.museum{display:grid;grid-template-columns:1fr 1fr;gap:18px 12px;margin-top:6px}
+.exhibit{position:relative;display:flex;flex-direction:column;align-items:center;cursor:pointer}
+.exhibit::before{content:"";position:absolute;top:-18px;left:8%;right:8%;height:78%;background:radial-gradient(60% 100% at 50% 0%,rgba(255,225,170,.2),rgba(255,225,170,0));pointer-events:none}
+.exhibit.locked::before{background:radial-gradient(60% 100% at 50% 0%,rgba(255,225,170,.05),rgba(255,225,170,0))}
+.exhibit .disp{position:relative;width:100%;aspect-ratio:1.3;display:grid;place-items:center}
+.exhibit .disp img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 6px 6px rgba(0,0,0,.6))}
+.exhibit.locked .disp img{opacity:.85}
+.exhibit .ped{width:86%;height:16px;margin-top:-4px;border-radius:4px 4px 2px 2px;background:linear-gradient(180deg,#d9cfc0,#a99d8c 60%,#7c7266);box-shadow:0 8px 14px rgba(0,0,0,.55)}
+.exhibit.locked .ped{background:linear-gradient(180deg,#4a4038,#2e2722)}
+.exhibit .plate{margin-top:8px;padding:5px 10px;border-radius:6px;background:linear-gradient(180deg,#f2d38a,#c9963c 55%,#a7762a);color:#3a2408;text-align:center;box-shadow:0 2px 0 #5a3c12,inset 0 1px 0 rgba(255,255,255,.5);min-width:82%}
+.exhibit .plate b{display:block;font-size:12.5px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.exhibit .plate span{font-size:10.5px;font-weight:800;opacity:.8}
+.exhibit.locked .plate{background:linear-gradient(180deg,#4a4038,#342c26);color:#8f8070;box-shadow:0 2px 0 #1a1410}
+.exhibit:active .disp{transform:scale(.97)}
+.mus-toast{position:absolute;left:50%;bottom:30px;transform:translateX(-50%);z-index:70;background:rgba(20,14,10,.95);border:1px solid var(--line);color:var(--cream);font-weight:800;font-size:14px;padding:10px 18px;border-radius:99px;pointer-events:none;animation:fup2 1.8s forwards}
+@keyframes fup2{0%{opacity:0;transform:translate(-50%,10px)}12%{opacity:1;transform:translate(-50%,0)}80%{opacity:1}100%{opacity:0}}
 /* ランキング */
 #s-rank{padding:14px 14px 24px;gap:12px;background:linear-gradient(180deg,#221a14,#15100c)}
 .tabs{display:flex;gap:6px;overflow-x:auto}
@@ -199,7 +260,7 @@ button:active{transform:scale(.96)}
 .name-in:focus{border-color:var(--amber)}
 .reg-info{text-align:center;font-size:14px;color:#ddd0bd;line-height:1.6}
 .reg-err{text-align:center;font-size:13px;color:#ff9a8f;min-height:18px}
-#fx{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:55}
+#fx{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:66}
 </style>
 </head>
 <body>
@@ -217,7 +278,7 @@ button:active{transform:scale(.96)}
       </div>
       <div class="title-progress" id="titleProgress"></div>
       <button class="btn-primary" id="btnStart">はじめる</button>
-      <div style="display:flex;gap:10px;width:100%;max-width:300px"><button class="btn-ghost" style="flex:1" onclick="sUI();openDex()">図鑑</button><button class="btn-ghost" style="flex:1" onclick="sUI();openRank()">ランキング</button></div>
+      <div style="display:flex;gap:10px;width:100%;max-width:300px"><button class="btn-ghost" style="flex:1;padding:12px 6px" onclick="sUI();openDex()">図鑑</button><button class="btn-ghost" style="flex:1;padding:12px 6px" onclick="sUI();openMuseum()">博物館</button><button class="btn-ghost" style="flex:1;padding:12px 6px" onclick="sUI();openRank()">ランキング</button></div>
     </div>
   </section>
 
@@ -262,6 +323,7 @@ button:active{transform:scale(.96)}
     <div class="r-name" id="rName"></div>
     <div class="r-score-row" id="rScoreRow"><div class="r-score"><span id="rScore">0</span><small>点</small></div><div class="stamp" id="stamp">S</div></div>
     <div id="rBadge"></div>
+    <div id="rParts"></div>
     <div class="r-detail" id="rDetail"></div>
     <div id="rRankSlot"></div>
     <div id="rShareSlot"></div>
@@ -276,6 +338,16 @@ button:active{transform:scale(.96)}
     </div>
     <div class="chip" id="dexProgress"></div>
     <div class="dex" id="dex"></div>
+  </section>
+
+  <!-- 博物館 -->
+  <section class="screen" id="s-museum">
+    <div class="bar">
+      <button class="icon-btn" id="musBack">‹</button>
+      <div class="bar-title">化石博物館</div>
+    </div>
+    <div class="chip" id="musProgress"></div>
+    <div class="museum" id="museum"></div>
   </section>
 
   <!-- ランキング -->
@@ -323,14 +395,21 @@ button:active{transform:scale(.96)}
     </div>
   </div>
 
-  <!-- 全身骨格 -->
-  <div class="overlay" id="assembly">
-    <div class="modal">
-      <div class="asm-title">全身骨格 完成!</div>
+  <!-- 全身骨格(全画面) -->
+  <div class="asm-full" id="assembly">
+    <canvas id="asmFx"></canvas>
+    <button class="asm-skip" id="asmSkip">スキップ ›</button>
+    <div class="asm-inner" id="asmInner">
+      <div class="asm-title" id="asmTitle">全身骨格 完成!</div>
+      <div class="asm-stars" id="asmStars"></div>
       <div class="asm-stage" id="asmStage"></div>
+      <div class="asm-roar" id="asmRoar">ガオォォォ!!</div>
       <div class="asm-name" id="asmName"></div>
-      <div id="asmShare" class="share-row" style="margin-top:-6px"></div>
-      <button class="btn-primary" onclick="sUI();document.getElementById('assembly').classList.remove('on')">とじる</button>
+      <div class="asm-count" id="asmCount"></div>
+      <div class="asm-after" id="asmAfter">
+        <div id="asmShare" class="share-row"></div>
+        <button class="btn-primary" id="asmClose">とじる</button>
+      </div>
     </div>
   </div>
   <canvas id="fx"></canvas>
@@ -511,6 +590,24 @@ function sStamp(){tn({f:110,f2:45,dur:0.25,g:0.7});nz({f:900,f2:200,dur:0.18,g:0
 function sCount(){tn({f:1900+Math.random()*200,dur:0.025,g:0.05,type:'square'})}
 function sTimeUp(){tn({f:330,dur:0.5,g:0.25,type:'square'});tn({f:247,dur:0.6,g:0.25,type:'square',at:0.25})}
 function sFanfare(big){const n=big?[523.3,659.3,784,1046.5,1318.5,1568]:[784,988,1175,1568];n.forEach((f,i)=>tn({f,dur:0.4,g:0.18,at:i*0.08,type:'triangle'}));(big?[523.3,659.3,784,1046.5]:[784,988,1175]).forEach(f=>tn({f,dur:1.6,g:0.08,at:n.length*0.08}))}
+function sThud(k){tn({f:110-k*6,f2:42,dur:0.28,g:0.75});nz({f:700,f2:150,dur:0.22,g:0.55});nz({type:'highpass',f:4000,dur:0.02,g:0.3})}
+function sShine(){[1568,2093,2637,3136].forEach((f,i)=>tn({f,dur:0.5,g:0.1,at:i*0.06}));tn({f:784,dur:1.6,g:0.12});tn({f:1175,dur:1.4,g:0.08,at:0.05})}
+function sPop(){tn({f:880,f2:1760,dur:0.12,g:0.2,type:'triangle'});tn({f:1760,dur:0.3,g:0.08,at:0.08})}
+function sDrum(dur){if(!SND.ctx)return;const c=SND.ctx,t=c.currentTime;
+  const s=c.createBufferSource();s.buffer=SND.nb;s.loop=true;const f=c.createBiquadFilter();f.type='lowpass';f.frequency.value=260;
+  const am=c.createGain();am.gain.value=0.6;const l=c.createOscillator();l.frequency.setValueAtTime(12,t);l.frequency.linearRampToValueAtTime(22,t+dur);const lg=c.createGain();lg.gain.value=0.4;l.connect(lg);lg.connect(am.gain);
+  const g=c.createGain();g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(0.5,t+dur);g.gain.exponentialRampToValueAtTime(0.0001,t+dur+0.25);
+  s.connect(f);f.connect(am);am.connect(g);g.connect(SND.master);s.start(t);l.start(t);s.stop(t+dur+0.3);l.stop(t+dur+0.3)}
+function sRoar(lv){if(!SND.ctx)return;const c=SND.ctx,t=c.currentTime,dur=1.4+lv*0.12;
+  const o=c.createOscillator();o.type='sawtooth';o.frequency.setValueAtTime(150,t);o.frequency.linearRampToValueAtTime(105,t+0.35);o.frequency.linearRampToValueAtTime(58,t+dur);
+  const o2=c.createOscillator();o2.type='square';o2.frequency.setValueAtTime(75,t);o2.frequency.linearRampToValueAtTime(30,t+dur);
+  const v=c.createOscillator();v.frequency.value=27;const vg=c.createGain();vg.gain.value=16;v.connect(vg);vg.connect(o.frequency);vg.connect(o2.frequency);
+  const f=c.createBiquadFilter();f.type='lowpass';f.Q.value=5;f.frequency.setValueAtTime(350,t);f.frequency.linearRampToValueAtTime(1700,t+0.28);f.frequency.linearRampToValueAtTime(420,t+dur);
+  const g=c.createGain();g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(0.55,t+0.12);g.gain.setValueAtTime(0.55,t+dur*0.55);g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+  const n=c.createBufferSource();n.buffer=SND.nb;n.playbackRate.value=0.7;const nf=c.createBiquadFilter();nf.type='bandpass';nf.frequency.value=900;nf.Q.value=0.8;
+  const ng=c.createGain();ng.gain.setValueAtTime(0.0001,t);ng.gain.exponentialRampToValueAtTime(0.45,t+0.1);ng.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+  o.connect(f);o2.connect(f);f.connect(g);g.connect(SND.master);n.connect(nf);nf.connect(ng);ng.connect(SND.master);
+  [o,o2,v,n].forEach(x=>{x.start(t);x.stop(t+dur+0.1)})}
 function drillOn(lv){
   if(!SND.ctx)return;drillOff();const c=SND.ctx;
   const s=c.createBufferSource();s.buffer=SND.nb;s.loop=true;
@@ -969,7 +1066,7 @@ function showResultInner(){
   document.getElementById('rName').textContent=sp.n+'の'+part;
   document.getElementById('rDetail').textContent=`露出 ${Math.floor(exp*100)}% ・ 残り耐久 ${Math.floor(durR*100)}%`;
   const row=document.getElementById('rScoreRow'),stamp=document.getElementById('stamp'),badge=document.getElementById('rBadge');
-  stamp.className='stamp';badge.innerHTML='';RES=null;SHARE=null;document.getElementById('rRankSlot').innerHTML='';document.getElementById('rShareSlot').innerHTML='';document.getElementById('rScore').textContent='0';
+  stamp.className='stamp';badge.innerHTML='';document.getElementById('rParts').innerHTML='';RES=null;SHARE=null;document.getElementById('rRankSlot').innerHTML='';document.getElementById('rShareSlot').innerHTML='';document.getElementById('rScore').textContent='0';
   // 化石の絵
   const dm=G.cellDmg;const fc=renderFossil(G.domeHi,D,FMARGIN,(x,y)=>{const r0=BI0[y]*SIM,r1=BI1[y]*SIM,i0=BI0[x],i1=BI1[x],fx=BF[x],fy=BF[y];
     const t=(dm[r0+i0]+(dm[r0+i1]-dm[r0+i0])*fx)*(1-fy)+(dm[r1+i0]+(dm[r1+i1]-dm[r1+i0])*fx)*fy;return t>0.002?Math.min(1,t/DMGFULL):0});
@@ -999,31 +1096,132 @@ function showResultInner(){
         requestAnimationFrame(()=>badge.firstChild.classList.add('on'));
         if(isNew||isUp){confetti(isNew?90:60);sFanfare(false)}
         rankButton();
-        if(completed)setTimeout(()=>showAssembly(G.rock.sp),1300)},380)}})();
+        partSlots(G.rock.sp,isNew?G.rock.part:-1,completed)},380)}})();
 }
 
 // ================= 全身骨格 =================
 const thumbCache={};
 function partCanvas(sp,part,size){const sh=makeShape(sp,part,RAR[SPECIES[sp].r].thick);return renderFossil(rasterDome(sh,size,0.05),size,0.05)}
 function thumbURL(sp,part){const k=sp+'-'+part;if(!thumbCache[k])thumbCache[k]=partCanvas(sp,part,96).toDataURL();return thumbCache[k]}
-function showAssembly(sp){
-  const st=document.getElementById('asmStage');st.innerHTML='';document.getElementById('asmName').textContent=SPECIES[sp].n;
-  document.getElementById('assembly').classList.add('on');
-  const W=st.clientWidth,H=st.clientHeight;
-  const lay=[[0,W*0.22,H*0.33,W*0.36],[1,W*0.55,H*0.38,W*0.5],[2,W*0.42,H*0.66,W*0.3],[3,W*0.72,H*0.64,W*0.36]];
-  lay.forEach(([part,x,y,s],k)=>{const cv=partCanvas(sp,part,192);cv.style.width=cv.style.height=s+'px';cv.style.left=(x-s/2)+'px';cv.style.top=(y-s/2)+'px';
-    cv.style.filter='drop-shadow(0 4px 6px rgba(0,0,0,.6))';const a=rnd()*Math.PI*2;cv.style.transform=`translate(${Math.cos(a)*W}px,${Math.sin(a)*H}px) rotate(${(rnd()-0.5)*90}deg)`;cv.style.opacity=0;
-    st.appendChild(cv);setTimeout(()=>{cv.style.opacity=1;cv.style.transform='none';tn({f:300+k*80,f2:200+k*60,dur:0.15,g:0.3})},250+k*260)});
-  setTimeout(()=>{sFanfare(true);confetti(140)},250+4*260+300);
-  // 共有の準備
-  const rec=(dexData[sp]&&dexData[sp].parts)||{},vals=PARTS.map((_,k)=>rec[k]||0),avg=Math.round(vals.reduce((a,b)=>a+b,0)/4);
-  const done=progressCounts().done,s0=SPECIES[sp];
+// 結果画面:その恐竜の4パーツ枠(新しいパーツがはまる)
+function partSlots(sp,newPart,completed){
+  const el=document.getElementById('rParts'),rec=(dexData[sp]&&dexData[sp].parts)||{},got=Object.keys(rec).length;
+  const slot=k=>{const has=rec[k]!==undefined&&k!==newPart;return `<div class="rp${has?' got':''}" data-k="${k}">${has?`<img src="${thumbURL(sp,k)}" alt="">`:'<span class="q">?</span>'}<em>${PARTS[k]}</em></div>`};
+  el.innerHTML=`<div class="rparts"><div class="rparts-row">${PARTS.map((_,k)=>slot(k)).join('')}</div><div class="rparts-msg" id="rpMsg"></div></div>`;
+  const msg=()=>{const m=document.getElementById('rpMsg');if(!m)return;
+    if(got===4){m.className='rparts-msg big';m.textContent=completed?'🦴 4パーツそろった!':'🦴 全身骨格 完成済み'}
+    else if(got===3){const miss=PARTS.find((_,k)=>rec[k]===undefined);m.className='rparts-msg big';m.textContent=`あと「${miss}」で全身骨格!`}
+    else{m.className='rparts-msg';m.textContent=`この恐竜のパーツ ${got}/4`}};
+  if(newPart>=0){setTimeout(()=>{const d=el.querySelector(`.rp[data-k="${newPart}"]`);if(!d)return;d.className='rp got new';d.innerHTML=`<img src="${thumbURL(sp,newPart)}" alt=""><em>${PARTS[newPart]}</em>`;sPop();buzz(15);
+      setTimeout(()=>{msg();if(got>=3)sDing(got===4?2:1);if(completed)setTimeout(()=>{if(CUR==='result')showAssembly(sp,{fresh:true})},1300)},450)},450)}
+  else msg();
+}
+
+// ---- 全身骨格 完成演出(全画面) ----
+const ASM_LAY=[[0,0.22,0.33,0.36],[1,0.55,0.38,0.5],[2,0.42,0.66,0.3],[3,0.72,0.64,0.36]];
+let ASMT=[],AFX={on:false,parts:[],rays:0,raysOn:false,lv:1,rot:0};
+function asmLater(ms,fn){ASMT.push(setTimeout(()=>{try{fn()}catch(e){reportErr(e)}},ms))}
+function asmClear(){ASMT.forEach(clearTimeout);ASMT=[]}
+function asmStageCenter(){const a=document.getElementById('app').getBoundingClientRect(),r=document.getElementById('asmStage').getBoundingClientRect(),c=document.getElementById('asmFx'),k=c.width/a.width;
+  return {x:(r.left-a.left+r.width/2)*k,y:(r.top-a.top+r.height/2)*k,w:r.width*k,h:r.height*k,ox:(r.left-a.left)*k,oy:(r.top-a.top)*k,k}}
+function afxBurst(x,y,n,kind){for(let i=0;i<n;i++){const a=rnd()*Math.PI*2,sp=(kind==='dust'?60:160)+rnd()*(kind==='dust'?120:320);
+  AFX.parts.push({k:kind,x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-(kind==='dust'?30:60),s:kind==='dust'?8+rnd()*10:3+rnd()*5,life:0.6+rnd()*0.7,max:1.3,ph:rnd()*6})}}
+function showAssembly(sp,opt){
+  opt=opt||{};asmClear();
+  const el=document.getElementById('assembly'),st=document.getElementById('asmStage'),s0=SPECIES[sp],fresh=!!opt.fresh;
+  ['asmTitle','asmStars','asmName','asmCount','asmAfter','asmRoar'].forEach(id=>document.getElementById(id).classList.remove('on'));
+  st.className='asm-stage';st.innerHTML='<div class="asm-spot"></div>';document.getElementById('asmInner').classList.remove('quake');
+  document.getElementById('asmSkip').classList.remove('hide');
+  document.getElementById('asmStars').textContent='★'.repeat(s0.r)+'☆'.repeat(4-s0.r);
+  document.getElementById('asmName').textContent=s0.n;
+  const done=progressCounts().done,cEl=document.getElementById('asmCount');
+  cEl.innerHTML=`完成 <b id="asmNum">${fresh?done-1:done}</b>/20体`;
+  el.classList.add('on');
+  const fx=document.getElementById('asmFx'),ar=document.getElementById('app').getBoundingClientRect(),dpr=Math.min(2,devicePixelRatio||1);fx.width=ar.width*dpr;fx.height=ar.height*dpr;
+  AFX={on:true,parts:[],rays:0,raysOn:false,lv:s0.r,rot:0};
+  const W=st.clientWidth,H=st.clientHeight,cvs=[];
+  ASM_LAY.forEach(([part,x,y,sz],k)=>{const cv=partCanvas(sp,part,224),z=W*sz;cv.style.width=cv.style.height=z+'px';cv.style.left=(x*W-z/2)+'px';cv.style.top=(y*H-z/2)+'px';
+    const a=-Math.PI/2+(rnd()-0.5)*1.6;cv.style.transform=`translate(${Math.cos(a)*W*1.1}px,${Math.sin(a)*H*1.6}px) rotate(${(rnd()-0.5)*120}deg) scale(1.4)`;st.appendChild(cv);cvs.push({cv,x,y})});
+  sDrum(2.6);
+  asmLater(250,()=>st.classList.add('lit'));
+  cvs.forEach(({cv,x,y},k)=>asmLater(650+k*520,()=>{cv.style.opacity=1;cv.style.transform='none';
+    asmLater(420,()=>{sThud(k);buzz(25);st.classList.remove('thud');void st.offsetWidth;st.classList.add('thud');
+      const c=asmStageCenter();afxBurst(c.ox+x*c.w,c.oy+y*c.h,10,'dust');afxBurst(c.ox+x*c.w,c.oy+y*c.h,8,'spark')})}));
+  const tA=650+4*520+450;
+  asmLater(tA,()=>{st.classList.add('glow');sShine();const c=asmStageCenter();afxBurst(c.x,c.y,36,'star');if(s0.r>=2)AFX.raysOn=true});
+  asmLater(tA+800,()=>{st.classList.add('shiver');document.getElementById('asmRoar').classList.add('on');sRoar(s0.r);buzz([90,40,140]);
+    const inn=document.getElementById('asmInner');inn.classList.remove('quake');void inn.offsetWidth;inn.classList.add('quake')});
+  asmLater(tA+2000,()=>{document.getElementById('asmTitle').classList.add('on');document.getElementById('asmStars').classList.add('on');sStamp();confetti(s0.r>=3?200:140);sFanfare(true)});
+  asmLater(tA+2500,()=>{document.getElementById('asmName').classList.add('on');cEl.classList.add('on');
+    if(fresh)asmLater(450,()=>{const b=document.getElementById('asmNum');b.textContent=done;b.classList.add('pop');sDing(2)})});
+  asmLater(tA+3200,asmFinishUI);
+  asmPrepShare(sp,done);
+}
+function asmFinishUI(){document.getElementById('asmAfter').classList.add('on');document.getElementById('asmSkip').classList.add('hide')}
+function asmSkip(){
+  sUI();asmClear();const st=document.getElementById('asmStage');
+  st.querySelectorAll('canvas').forEach(cv=>{cv.style.transition='none';cv.style.opacity=1;cv.style.transform='none'});
+  st.classList.add('lit','glow');if(AFX.lv>=2)AFX.raysOn=true;
+  ['asmTitle','asmStars','asmName','asmCount'].forEach(id=>document.getElementById(id).classList.add('on'));
+  const b=document.getElementById('asmNum');b.textContent=progressCounts().done;asmFinishUI();
+}
+function asmClose(){sUI();asmClear();document.getElementById('assembly').classList.remove('on');setTimeout(()=>{AFX.on=false},450)}
+document.getElementById('asmSkip').onclick=asmSkip;document.getElementById('asmClose').onclick=asmClose;
+function drawAsmFx(dt){
+  const c=document.getElementById('asmFx'),x=c.getContext('2d');x.clearRect(0,0,c.width,c.height);
+  const cc=asmStageCenter();
+  if(AFX.raysOn){AFX.rays=Math.min(1,AFX.rays+dt*0.8);AFX.rot+=dt*0.25;const n=16,R=Math.max(c.width,c.height),al=(AFX.lv>=4?0.26:AFX.lv===3?0.17:0.1)*AFX.rays;
+    x.save();x.translate(cc.x,cc.y);x.rotate(AFX.rot);
+    for(let i=0;i<n;i++){x.rotate(Math.PI*2/n);const g=x.createLinearGradient(0,0,R,0);g.addColorStop(0,`rgba(255,215,120,${al})`);g.addColorStop(1,'rgba(255,215,120,0)');
+      x.fillStyle=g;x.beginPath();x.moveTo(0,0);x.lineTo(R,-R*0.09);x.lineTo(R,R*0.09);x.closePath();x.fill()}
+    x.restore();const g=x.createRadialGradient(cc.x,cc.y,0,cc.x,cc.y,cc.w*0.6);g.addColorStop(0,`rgba(255,230,170,${0.25*AFX.rays})`);g.addColorStop(1,'rgba(255,230,170,0)');x.fillStyle=g;x.fillRect(0,0,c.width,c.height)}
+  for(const p of AFX.parts){p.life-=dt;p.x+=p.vx*dt;p.y+=p.vy*dt;const a=Math.max(0,Math.min(1,p.life/(p.max*0.5)));
+    if(p.k==='dust'){p.vx*=0.94;p.vy*=0.94;p.s+=dt*20;x.globalAlpha=0.3*a;x.fillStyle='#bfa98c';x.beginPath();x.arc(p.x,p.y,p.s*cc.k,0,7);x.fill()}
+    else if(p.k==='spark'){p.vx*=0.92;p.vy*=0.92;x.globalAlpha=a;x.strokeStyle='#fff1c8';x.lineWidth=2*cc.k;x.beginPath();x.moveTo(p.x,p.y);x.lineTo(p.x-p.vx*0.04,p.y-p.vy*0.04);x.stroke()}
+    else{p.vx*=0.96;p.vy=p.vy*0.96+20*dt;const tw=Math.max(0,Math.sin((p.max-p.life)*10+p.ph)),z=p.s*cc.k*(0.5+tw*0.6);x.globalAlpha=a*(0.4+tw*0.6);x.fillStyle='#fff6d8';
+      x.beginPath();x.moveTo(p.x,p.y-z*2);x.quadraticCurveTo(p.x,p.y,p.x+z*2,p.y);x.quadraticCurveTo(p.x,p.y,p.x,p.y+z*2);x.quadraticCurveTo(p.x,p.y,p.x-z*2,p.y);x.quadraticCurveTo(p.x,p.y,p.x,p.y-z*2);x.fill()}}
+  x.globalAlpha=1;AFX.parts=AFX.parts.filter(p=>p.life>0);
+}
+function asmPrepShare(sp,done){
+  const rec=(dexData[sp]&&dexData[sp].parts)||{},vals=PARTS.map((_,k)=>rec[k]||0),avg=Math.round(vals.reduce((a,b)=>a+b,0)/4),s0=SPECIES[sp];
   ASM={sp,avg,done,text:`化石採掘で${'★'.repeat(s0.r)}${s0.n}の全身骨格を完成させた!🦴\n4パーツ平均${avg}点 ・ 完成${done}/20体\n#化石採掘`,blob:null,url:null};
   const box=document.getElementById('asmShare');
   box.innerHTML=`<button class="btn-img" id="btnAsmShare"><svg viewBox="0 0 24 24" fill="none" stroke="#2b1806" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/></svg>画像で共有</button><a class="btn-x" href="${xIntentURL(ASM.text)}" target="_blank" rel="noopener" onclick="sUI()">${X_SVG}Xに投稿</a>`;
   document.getElementById('btnAsmShare').onclick=()=>{sUI();shareWith(ASM)};
   const tok=ASM;makeAsmImage(sp,avg,done).then(cv=>{if(ASM!==tok)return;ASM.url=cv.toDataURL('image/png');cv.toBlob(b=>{if(ASM===tok)ASM.blob=b},'image/png')}).catch(reportErr);
 }
+
+// ================= 博物館 =================
+const compCache={};
+function compositeURL(sp,owned){
+  // owned: 持っているパーツ番号の配列。持っていないパーツは黒いシルエットで描く
+  const k=sp+':'+owned.join('');if(compCache[k])return compCache[k];
+  const W=300,H=Math.round(W/1.3),cv=document.createElement('canvas');cv.width=W;cv.height=H;const c=cv.getContext('2d');
+  const tmp2=document.createElement('canvas');tmp2.width=W;tmp2.height=H;const t2=tmp2.getContext('2d');
+  for(const [part,x,y,sz] of ASM_LAY){const pc=partCanvas(sp,part,128),z=W*sz;
+    if(owned.includes(part))c.drawImage(pc,x*W-z/2,y*H-z/2,z,z);
+    else{t2.clearRect(0,0,W,H);t2.globalCompositeOperation='source-over';t2.drawImage(pc,x*W-z/2,y*H-z/2,z,z);t2.globalCompositeOperation='source-in';t2.fillStyle='#0b0806';t2.fillRect(0,0,W,H);c.drawImage(tmp2,0,0)}}
+  return compCache[k]=cv.toDataURL('image/png');
+}
+let musFrom='title',musJob=0;
+document.getElementById('musBack').onclick=()=>{sUI();musJob++;if(musFrom==='dex')openDex();else toTitle()};
+function musToast(t){const d=document.createElement('div');d.className='mus-toast';d.textContent=t;document.getElementById('app').appendChild(d);setTimeout(()=>d.remove(),1900)}
+function openMuseum(){
+  musFrom=CUR==='museum'?musFrom:CUR;const {done}=progressCounts();
+  document.getElementById('musProgress').textContent=`展示中 ${done}/20体`;
+  const el=document.getElementById('museum');el.innerHTML='';const job=++musJob,todo=[];
+  SPECIES.forEach((sp,i)=>{const rec=(dexData[i]&&dexData[i].parts)||{},got=Object.keys(rec).length,full=got===4;
+    const avg=full?Math.round(PARTS.reduce((a,_,k)=>a+rec[k],0)/4):0;
+    const d=document.createElement('div');d.className='exhibit'+(full?'':' locked');
+    d.innerHTML=`<div class="disp"><img alt=""></div><div class="ped"></div><div class="plate"><b>${got?esc(sp.n):'？？？'}</b><span>${'★'.repeat(sp.r)}${full?` ・ 平均${avg}点`:` ・ ${got}/4`}</span></div>`;
+    d.onclick=()=>{sUI();if(full)showAssembly(i);else musToast(got?`あと${4-got}パーツで展示できます`:'まだ化石が見つかっていません')};
+    el.appendChild(d);todo.push([d.querySelector('img'),i,PARTS.map((_,k)=>k).filter(k=>rec[k]!==undefined)]);
+  });
+  show('museum');
+  // 少しずつ描いて、画面が固まらないようにする
+  (function next(){if(job!==musJob||!todo.length)return;const [img,i,own]=todo.shift();img.src=compositeURL(i,own);setTimeout(next,0)})();
+}
+
 let ASM=null;
 async function makeAsmImage(sp,avg,done){
   try{if(document.fonts){await Promise.race([Promise.all([document.fonts.load('40px "Dela Gothic One"','化石採掘全身骨格完成'),document.fonts.load('700 30px "M PLUS Rounded 1c"','平均点')]),new Promise(r=>setTimeout(r,1500))])}}catch(e){}
@@ -1236,6 +1434,7 @@ function loopBody(now){
     G.trauma=Math.max(0,G.trauma-dt*2.2);
     try{drawBoard(dt)}catch(e){reportErr(e)}
   }
+  if(AFX.on){try{drawAsmFx(dt)}catch(e){reportErr(e)}}
   try{drawFx(dt)}catch(e){FX=[];reportErr(e)}
 }
 drawSndBtn();
