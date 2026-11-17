@@ -92,6 +92,8 @@ button:active{transform:scale(.96)}
 @keyframes blink{50%{opacity:.5}}
 .gauge.exp>b{background:linear-gradient(180deg,#ffd987,#e89a2e)}
 .gauge i{position:absolute;top:0;bottom:0;width:2px;background:rgba(255,255,255,.18);transition:background .3s}
+.gauge u{position:absolute;top:-1px;bottom:-1px;width:3px;margin-left:-1px;background:#ef6a5e;box-shadow:0 0 6px rgba(239,106,94,.8);transition:all .3s}
+.gauge u.ok{background:#8fe0a0;box-shadow:0 0 6px rgba(143,224,160,.9)}
 .gauge i.on{background:#fff;box-shadow:0 0 8px #ffd27a}
 .bar-row .val{text-align:right;color:var(--cream);font-variant-numeric:tabular-nums}
 .board-wrap{position:relative;width:100%;aspect-ratio:1;border-radius:18px;overflow:hidden;background:#24292b;box-shadow:0 10px 30px rgba(0,0,0,.6)}
@@ -209,7 +211,7 @@ button:active{transform:scale(.96)}
       <div class="timer" id="timer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2h6"/></svg><span id="time">90</span></div>
       <div class="bars">
         <div class="bar-row"><span>耐久</span><div class="gauge" id="gauge"><b id="gaugeBar" style="width:100%"></b></div><span class="val" id="durTxt">100</span></div>
-        <div class="bar-row"><span>露出</span><div class="gauge exp" id="expGauge"><b id="expBar" style="width:0%"></b><i style="left:25%"></i><i style="left:50%"></i><i style="left:75%"></i></div><span class="val" id="expTxt">0%</span></div>
+        <div class="bar-row"><span>露出</span><div class="gauge exp" id="expGauge"><b id="expBar" style="width:0%"></b><i style="left:25%"></i><i style="left:50%"></i><i style="left:75%"></i><u style="left:60%"></u></div><span class="val" id="expTxt">0%</span></div>
       </div>
     </div>
     <div class="board-wrap" id="boardWrap"><canvas id="board"></canvas><div class="board-frame"></div><div class="float-layer" id="floatLayer"></div></div>
@@ -250,7 +252,7 @@ button:active{transform:scale(.96)}
       <div class="how"><div class="ic"><svg viewBox="0 0 40 40"><rect x="6" y="7" width="22" height="11" rx="2.5" transform="rotate(38 17 12.5)" fill="#9aa3ab"/><path d="M21 17 L33 33" stroke="#b37a45" stroke-width="4" stroke-linecap="round"/></svg></div><div><b>ハンマー</b>はタップ。岩をまとめて砕けるが、化石に当たると大ダメージ。黒っぽい<b>硬い岩</b>はハンマーで崩そう</div></div>
       <div class="how"><div class="ic"><svg viewBox="0 0 40 40"><rect x="5" y="14" width="17" height="12" rx="4" fill="#c4502f"/><path d="M22 16 L37 20 L22 24z" fill="#c9d0d6"/></svg></div><div><b>ドリル</b>はなぞって削る。●が少ないほど遅いけど安全。仕上げは●1つで</div></div>
       <div class="how"><div class="ic"><svg viewBox="0 0 40 40"><path d="M8 26c4-10 10-14 24-14" stroke="#efe2c4" stroke-width="7" stroke-linecap="round" fill="none"/><circle cx="24" cy="14" r="5" fill="#a45ee0"/></svg></div><div>化石を傷つけると<b style="color:#d9a8ff">紫</b>に変わる。耐久が0になると砕けて失敗</div></div>
-      <div class="how"><div class="ic"><svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="13" fill="none" stroke="#f0b44c" stroke-width="3"/><path d="M20 12v8l5 4" stroke="#f0b44c" stroke-width="3" stroke-linecap="round" fill="none"/></svg></div><div>時間内に化石を全部出せたら高得点。傷が少ないほど点が上がる</div></div>
+      <div class="how"><div class="ic"><svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="13" fill="none" stroke="#f0b44c" stroke-width="3"/><path d="M20 12v8l5 4" stroke="#f0b44c" stroke-width="3" stroke-linecap="round" fill="none"/></svg></div><div>露出<b>60%以上</b>で成功(ゲージの赤い線)。全部出せたら高得点、傷が少ないほど点が上がる</div></div>
       <button class="btn-primary" onclick="sUI();hideHowto()">わかった</button>
     </div>
   </div>
@@ -289,6 +291,7 @@ const TOOLS={
   d2:{r:3.0,rate:18,dmg:0.006},
   d3:{r:4.1,rate:30,dmg:0.023}
 };
+const PASS=0.6;
 const SIM=96, NS=SIM*SIM, D=SIM*4, ND=D*D, FMARGIN=0.14;
 
 // ================= 保存 =================
@@ -775,7 +778,7 @@ function updateHud(){
   const durR=Math.max(0,1-G.totalDmg/G.R.dur);document.getElementById('gaugeBar').style.width=(durR*100)+'%';
   document.getElementById('durTxt').textContent=Math.ceil(durR*100);
   document.getElementById('gauge').classList.toggle('danger',durR<0.3);
-  G.exp=exposure();document.getElementById('expBar').style.width=(G.exp*100)+'%';document.getElementById('expTxt').textContent=Math.floor(G.exp*100)+'%';
+  G.exp=exposure();document.getElementById('expBar').style.width=(G.exp*100)+'%';document.querySelector('#expGauge u').classList.toggle('ok',G.exp>=PASS);document.getElementById('expTxt').textContent=Math.floor(G.exp*100)+'%';
 }
 function checkMilestones(){
   if(!G.revealed&&G.exp>0){G.revealed=true;sReveal();let best=null;for(const i of G.fossilIdx)if(G.cov[i]<=0.001){best=i;break}
@@ -872,7 +875,7 @@ function drawFx(dt){if(!FX.length)return;fxx.clearRect(0,0,fxc.width,fxc.height)
   FX=FX.filter(p=>p.life>0&&p.y<fxc.height+50);if(!FX.length)fxx.clearRect(0,0,fxc.width,fxc.height)}
 function showResult(){
   const reason=G.reason,exp=G.exp,durR=Math.max(0,1-G.totalDmg/G.R.dur);
-  const ok=reason!=='broken'&&exp>=0.3,score=ok?Math.round(exp*70+durR*30):0;
+  const ok=reason!=='broken'&&exp>=PASS,score=ok?Math.round(exp*70+durR*30):0;
   const sp=SPECIES[G.rock.sp],part=PARTS[G.rock.part];
   document.getElementById('rStars').textContent='★'.repeat(sp.r)+'☆'.repeat(4-sp.r);
   document.getElementById('rName').textContent=sp.n+'の'+part;
@@ -892,7 +895,8 @@ function showResult(){
       c2.moveTo(cx,cy);c2.arc(cx,cy,rc.width,a0,a1);c2.closePath();c2.clip();const m=(a0+a1)/2;c2.translate(Math.cos(m)*10*dpr,Math.sin(m)*10*dpr);c2.rotate((rnd()-0.5)*0.12);
       c2.drawImage(fc,bx0-4,by0-4,bw,bh,ox,oy,dw,dh);c2.restore()}
   }else c2.drawImage(fc,bx0-4,by0-4,bw,bh,ox,oy,dw,dh);
-  if(!ok){row.innerHTML=`<div class="r-fail">${reason==='broken'?'化石が砕けてしまった…':(reason==='time'?'時間切れ。':'')+'ほとんど掘り出せなかった…'}</div>`;return}
+  if(!ok){const msg=reason==='broken'?'化石が砕けてしまった…':(reason==='time'?'時間切れ。':'')+'掘り出しが足りなかった…';
+    row.innerHTML=`<div style="display:flex;flex-direction:column;align-items:center;gap:6px"><div class="r-fail">${msg}</div>${reason==='broken'?'':'<div class="r-detail">成功には露出60%以上が必要です</div>'}</div>`;return}
   row.innerHTML='<div class="r-score"><span id="rScore">0</span><small>点</small></div><div class="stamp" id="stamp"></div>';
   const rec=dexData[G.rock.sp]||(dexData[G.rock.sp]={parts:{}}),prev=rec.parts[G.rock.part];
   const isNew=prev===undefined,isUp=!isNew&&score>prev;
