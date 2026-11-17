@@ -1187,7 +1187,7 @@ function asmPrepShare(sp,done){
   const rec=(dexData[sp]&&dexData[sp].parts)||{},vals=PARTS.map((_,k)=>rec[k]||0),avg=Math.round(vals.reduce((a,b)=>a+b,0)/4),s0=SPECIES[sp];
   ASM={sp,avg,done,text:`化石採掘で${'★'.repeat(s0.r)}${s0.n}の全身骨格を完成させた!🦴\n4パーツ平均${avg}点 ・ 完成${done}/20体\n#化石採掘`,blob:null,url:null};
   const box=document.getElementById('asmShare');
-  box.innerHTML=`<button class="btn-img" id="btnAsmShare"><svg viewBox="0 0 24 24" fill="none" stroke="#2b1806" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/></svg>画像で共有</button><a class="btn-x" href="${xIntentURL(ASM.text)}" target="_blank" rel="noopener" onclick="sUI()">${X_SVG}Xに投稿</a>`;
+  box.innerHTML=`<button class="btn-img" id="btnAsmShare"><svg viewBox="0 0 24 24" fill="none" stroke="#2b1806" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/></svg>画像で共有</button>`;
   document.getElementById('btnAsmShare').onclick=()=>{sUI();shareWith(ASM)};
   const tok=ASM;makeAsmImage(sp,avg,done).then(cv=>{if(ASM!==tok)return;ASM.url=cv.toDataURL('image/png');cv.toBlob(b=>{if(ASM===tok)ASM.blob=b},'image/png')}).catch(reportErr);
 }
@@ -1280,7 +1280,7 @@ const X_SVG='<svg viewBox="0 0 24 24" fill="#fff"><path d="M18.244 2.25h3.308l-7
 function xIntentURL(t){return 'https://x.com/intent/tweet?text='+encodeURIComponent(t||shareText())+'&url='+encodeURIComponent(SITE_URL)}
 function renderShare(){
   const slot=document.getElementById('rShareSlot');if(!SHARE){slot.innerHTML='';return}
-  slot.innerHTML=`<div class="share-row"><button class="btn-img" id="btnImgShare"><svg viewBox="0 0 24 24" fill="none" stroke="#2b1806" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/></svg>画像で共有</button><a class="btn-x" href="${xIntentURL()}" target="_blank" rel="noopener" onclick="sUI()">${X_SVG}Xに投稿</a></div>`;
+  slot.innerHTML=`<div class="share-row"><button class="btn-img" id="btnImgShare"><svg viewBox="0 0 24 24" fill="none" stroke="#2b1806" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/></svg>画像で共有</button></div>`;
   document.getElementById('btnImgShare').onclick=shareImage;
   SHARE.blob=null;SHARE.url=null;const tok=SHARE.tok=Math.random();
   makeShareImage().then(cv=>{if(SHARE&&SHARE.tok===tok){SHARE.url=cv.toDataURL('image/png');cv.toBlob(b=>{if(SHARE&&SHARE.tok===tok)SHARE.blob=b},'image/png')}}).catch(reportErr);
