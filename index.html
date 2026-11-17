@@ -46,7 +46,7 @@ button:active{transform:scale(.96)}
 .title-progress{font-size:13px;color:#d8c8b0;background:rgba(10,6,4,.55);padding:6px 14px;border-radius:99px;border:1px solid var(--line)}
 #btnStart{width:100%;max-width:300px;font-size:21px;padding:17px;animation:breathe 2.2s ease-in-out infinite}
 @keyframes breathe{0%,100%{box-shadow:0 5px 0 #9b5f14,0 0 0 rgba(255,200,90,0)}50%{box-shadow:0 5px 0 #9b5f14,0 0 34px rgba(255,200,90,.55)}}
-.title-wrap .btn-ghost{width:100%;max-width:300px;background:rgba(10,6,4,.5)}
+.title-wrap .btn-ghost{background:rgba(10,6,4,.5)}
 
 /* 岩選び(作業台) */
 #s-select{background:radial-gradient(120% 70% at 50% 18%,rgba(255,196,110,.28),rgba(255,170,80,0) 60%),repeating-linear-gradient(92deg,rgba(0,0,0,.08) 0 2px,rgba(0,0,0,0) 2px 9px),repeating-linear-gradient(89deg,rgba(255,220,170,.035) 0 1px,rgba(0,0,0,0) 1px 23px),linear-gradient(180deg,#4a3020,#3a2418 55%,#24160e);padding:14px 16px 22px;gap:14px}
@@ -170,6 +170,29 @@ button:active{transform:scale(.96)}
 .asm-stage canvas{position:absolute;transition:transform .7s cubic-bezier(.2,.9,.3,1.15),opacity .4s}
 .asm-title{font-family:"Dela Gothic One";font-size:24px;text-align:center;background:linear-gradient(180deg,#fff3d0,#f0b44c);-webkit-background-clip:text;background-clip:text;color:transparent}
 .asm-name{text-align:center;font-weight:800;color:var(--cream)}
+/* ランキング */
+#s-rank{padding:14px 14px 24px;gap:12px;background:linear-gradient(180deg,#221a14,#15100c)}
+.tabs{display:flex;gap:6px;overflow-x:auto}
+.tabs button{flex:1;min-width:52px;padding:9px 6px;border-radius:12px;background:rgba(255,235,200,.06);border:1px solid var(--line);font-weight:800;font-size:13px;color:var(--sub);white-space:nowrap}
+.tabs button.sel{background:linear-gradient(180deg,#5a4126,#3a2a1b);border-color:var(--amber);color:var(--cream)}
+.rank-list{display:flex;flex-direction:column;gap:7px}
+.rk-row{display:grid;grid-template-columns:38px 46px 1fr auto;align-items:center;gap:10px;background:linear-gradient(180deg,#2b221b,#211a15);border:1px solid var(--line);border-radius:14px;padding:8px 12px 8px 8px}
+.rk-row.me{border-color:rgba(240,180,76,.8);box-shadow:0 0 14px rgba(240,180,76,.18)}
+.rk-no{font-family:"Dela Gothic One";font-size:18px;text-align:center;color:var(--sub)}
+.rk-no.g1{color:#ffd24a;text-shadow:0 0 10px rgba(255,210,74,.6)}.rk-no.g2{color:#d9e1e8}.rk-no.g3{color:#d9925a}
+.rk-row img{width:46px;height:46px;object-fit:contain;background:#1b2224;border-radius:10px;padding:3px}
+.rk-main{min-width:0}
+.rk-name{font-weight:800;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rk-sub{font-size:11.5px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rk-score{text-align:right;font-family:"Dela Gothic One";font-size:20px;color:var(--cream);line-height:1.1}
+.rk-score small{display:block;font-family:"M PLUS Rounded 1c";font-size:11px;color:var(--amber);font-weight:800}
+.rank-msg{text-align:center;color:var(--sub);font-size:14px;line-height:1.7;padding:30px 10px}
+.rank-msg a{color:var(--amber2)}
+.btn-rank{margin-top:10px;font-size:15px;padding:11px 20px;border-radius:99px;background:linear-gradient(180deg,#6a4c2a,#4a3420);border:1px solid var(--amber);color:var(--cream);font-weight:800;box-shadow:0 0 16px rgba(240,180,76,.2)}
+.name-in{width:100%;font:inherit;font-size:18px;font-weight:700;padding:13px 14px;border-radius:14px;border:1px solid var(--line);background:#15100d;color:var(--cream);outline:none;-webkit-user-select:text;user-select:text}
+.name-in:focus{border-color:var(--amber)}
+.reg-info{text-align:center;font-size:14px;color:#ddd0bd;line-height:1.6}
+.reg-err{text-align:center;font-size:13px;color:#ff9a8f;min-height:18px}
 #fx{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:55}
 </style>
 </head>
@@ -188,7 +211,7 @@ button:active{transform:scale(.96)}
       </div>
       <div class="title-progress" id="titleProgress"></div>
       <button class="btn-primary" id="btnStart">はじめる</button>
-      <button class="btn-ghost" onclick="sUI();openDex()">図鑑</button>
+      <div style="display:flex;gap:10px;width:100%;max-width:300px"><button class="btn-ghost" style="flex:1" onclick="sUI();openDex()">図鑑</button><button class="btn-ghost" style="flex:1" onclick="sUI();openRank()">ランキング</button></div>
     </div>
   </section>
 
@@ -234,6 +257,7 @@ button:active{transform:scale(.96)}
     <div class="r-score-row" id="rScoreRow"><div class="r-score"><span id="rScore">0</span><small>点</small></div><div class="stamp" id="stamp">S</div></div>
     <div id="rBadge"></div>
     <div class="r-detail" id="rDetail"></div>
+    <div id="rRankSlot"></div>
     <div class="r-btns"><button class="btn-primary" onclick="sUI();toSelect()">次の岩へ</button><button class="btn-ghost" onclick="sUI();openDex()">図鑑</button></div>
   </section>
 
@@ -246,6 +270,28 @@ button:active{transform:scale(.96)}
     <div class="chip" id="dexProgress"></div>
     <div class="dex" id="dex"></div>
   </section>
+
+  <!-- ランキング -->
+  <section class="screen" id="s-rank">
+    <div class="bar">
+      <button class="icon-btn" id="rankBack">‹</button>
+      <div class="bar-title">綺麗な化石ランキング</div>
+    </div>
+    <div class="tabs" id="rankTabs"><button data-r="0" class="sel">総合</button><button data-r="1">★1</button><button data-r="2">★2</button><button data-r="3">★3</button><button data-r="4">★4</button></div>
+    <div class="rank-list" id="rankList"></div>
+  </section>
+
+  <!-- ランキング登録 -->
+  <div class="overlay" id="regModal">
+    <div class="modal">
+      <h3>ランキングに登録</h3>
+      <div class="reg-info" id="regInfo"></div>
+      <input class="name-in" id="regName" maxlength="10" placeholder="名前(10文字まで)" autocomplete="off">
+      <div class="reg-err" id="regErr"></div>
+      <button class="btn-primary" id="regSend">登録する</button>
+      <button class="btn-ghost" onclick="sUI();closeReg()">やめる</button>
+    </div>
+  </div>
 
   <!-- 遊び方 -->
   <div class="overlay" id="howto">
@@ -900,7 +946,7 @@ function showResult(){
   document.getElementById('rName').textContent=sp.n+'の'+part;
   document.getElementById('rDetail').textContent=`露出 ${Math.floor(exp*100)}% ・ 残り耐久 ${Math.floor(durR*100)}%`;
   const row=document.getElementById('rScoreRow'),stamp=document.getElementById('stamp'),badge=document.getElementById('rBadge');
-  stamp.className='stamp';badge.innerHTML='';document.getElementById('rScore').textContent='0';
+  stamp.className='stamp';badge.innerHTML='';RES=null;document.getElementById('rRankSlot').innerHTML='';document.getElementById('rScore').textContent='0';
   // 化石の絵
   const dm=G.cellDmg;const fc=renderFossil(G.domeHi,D,FMARGIN,(x,y)=>{const r0=BI0[y]*SIM,r1=BI1[y]*SIM,i0=BI0[x],i1=BI1[x],fx=BF[x],fy=BF[y];
     const t=(dm[r0+i0]+(dm[r0+i1]-dm[r0+i0])*fx)*(1-fy)+(dm[r1+i0]+(dm[r1+i1]-dm[r1+i0])*fx)*fy;return t>0.002?Math.min(1,t/DMGFULL):0});
@@ -921,12 +967,14 @@ function showResult(){
   const isNew=prev===undefined,isUp=!isNew&&score>prev;
   if(isNew||isUp)rec.parts[G.rock.part]=score;saveDex();
   const completed=isNew&&Object.keys(rec.parts).length===4;
+  RES={species:G.rock.sp,part:G.rock.part,rarity:sp.r,score,exposure:Math.round(exp*100),durability:Math.round(durR*100),sent:false};
   const se=document.getElementById('rScore'),st=document.getElementById('stamp');const t0=performance.now(),dur=Math.min(1200,300+score*10);let lastV=-1;
   (function step(){const k=Math.min(1,(performance.now()-t0)/dur),v=Math.round(score*(1-Math.pow(1-k,3)));if(v!==lastV){se.textContent=v;if(v%3===0)sCount();lastV=v}
     if(k<1)requestAnimationFrame(step);else{const rk=rankOf(score);st.textContent=rk;st.className='stamp on '+rk;sStamp();buzz(30);
       setTimeout(()=>{badge.innerHTML=isNew?'<span class="badge new">NEW! 図鑑に登録</span>':isUp?`<span class="badge up">最高記録更新!(前回 ${prev}点)</span>`:`<span class="badge keep">記録 ${prev}点(更新ならず)</span>`;
         requestAnimationFrame(()=>badge.firstChild.classList.add('on'));
         if(isNew||isUp){confetti(isNew?90:60);sFanfare(false)}
+        rankButton();
         if(completed)setTimeout(()=>showAssembly(G.rock.sp),1300)},380)}})();
 }
 
@@ -960,6 +1008,71 @@ function openDex(){
     el.appendChild(d)});
   el.querySelectorAll('.dex-done button').forEach(b=>b.onclick=()=>{sUI();showAssembly(+b.dataset.sp)});
   show('dex');
+}
+
+// ================= ランキング(Supabase) =================
+const SB_URL='https://ehbdcbdbvwacddcozgno.supabase.co',SB_KEY='sb_publishable_ULeF5AycXtkj3zisHOePag_6bE4Aq9c';
+const SITE_URL='https://pani1208.github.io/kaseki-saikutsu/';
+const SB_H={'apikey':SB_KEY};
+const NG=['しね','死ね','氏ね','ころす','殺す','ころせ','殺せ','ちんこ','ちんぽ','まんこ','せっくす','sex','fuck','shit','bitch','dick','pussy','nigger','nigga','kill','rape','れいぷ','きちがい','キチガイ','気違い','かたわ','池沼','ちしょう','がいじ','ガイジ','障害者','しょうがいしゃ','ぶす','ブス','きもい','うざい','ばか','あほ','ごみ'];
+function normName(n){return n.normalize('NFKC').toLowerCase().replace(/[\s　._\-・ー〜~!！?？*＊]/g,'').replace(/[ァ-ヶ]/g,c=>String.fromCharCode(c.charCodeAt(0)-0x60))}
+function badName(n){const z=normName(n);return NG.some(w=>z.includes(normName(w)))}
+function esc(t){return String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+let myIds=[];try{myIds=JSON.parse(localStorage.getItem('dinoMyIds')||'[]')||[]}catch(e){}
+let RES=null,rankTab=0,rankFrom='title';
+async function sbGet(q,extra){const r=await fetch(SB_URL+'/rest/v1/ranking?'+q,{headers:Object.assign({},SB_H,extra||{})});if(!r.ok)throw new Error('HTTP '+r.status);return r}
+function rankButton(){
+  const slot=document.getElementById('rRankSlot');slot.innerHTML='';if(!RES||RES.sent)return;
+  const b=document.createElement('button');b.className='btn-rank';b.textContent='🏆 ランキングに登録';b.onclick=()=>{sUI();openReg()};slot.appendChild(b);
+}
+function openReg(){
+  const sp=SPECIES[RES.species];
+  document.getElementById('regInfo').innerHTML=`${'★'.repeat(sp.r)} ${esc(sp.n)}の${PARTS[RES.part]}<br><b style="font-size:22px;color:#f2e5cb">${RES.score}点</b>(露出${RES.exposure}% ・ 耐久${RES.durability}%)`;
+  const inp=document.getElementById('regName');inp.value=settings.name||'';document.getElementById('regErr').textContent='';
+  document.getElementById('regSend').disabled=false;document.getElementById('regModal').classList.add('on');setTimeout(()=>inp.focus(),300);
+}
+function closeReg(){document.getElementById('regModal').classList.remove('on')}
+document.getElementById('regSend').onclick=async()=>{
+  audioInit();const err=document.getElementById('regErr'),btn=document.getElementById('regSend');
+  const name=document.getElementById('regName').value.replace(/[\u0000-\u001f\u007f]/g,'').trim();
+  if(!name){err.textContent='名前を入れてください';return}
+  if([...name].length>10){err.textContent='名前は10文字までです';return}
+  if(badName(name)){err.textContent='その名前は使えません';return}
+  const last=+(settings.lastSend||0);if(Date.now()-last<20000){err.textContent='少し時間をおいてからもう一度どうぞ';return}
+  btn.disabled=true;err.textContent='送信中…';
+  try{
+    const body={name,species:RES.species,part:RES.part,rarity:RES.rarity,score:RES.score,exposure:RES.exposure,durability:RES.durability};
+    const r=await fetch(SB_URL+'/rest/v1/ranking',{method:'POST',headers:Object.assign({'Content-Type':'application/json','Prefer':'return=representation'},SB_H),body:JSON.stringify(body)});
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    const rows=await r.json();if(rows&&rows[0]&&rows[0].id){myIds.push(rows[0].id);try{localStorage.setItem('dinoMyIds',JSON.stringify(myIds.slice(-200)))}catch(e){}}
+    settings.name=name;settings.lastSend=Date.now();saveSet();RES.sent=true;
+    // 順位を数える
+    let pos=null;try{const q=`select=id&rarity=eq.${RES.rarity}&or=(score.gt.${RES.score},and(score.eq.${RES.score},durability.gt.${RES.durability}))`;
+      const c=await sbGet(q,{'Prefer':'count=exact','Range':'0-0'});const cr=c.headers.get('content-range');if(cr&&cr.includes('/'))pos=+cr.split('/')[1]+1}catch(e){}
+    closeReg();sFanfare(false);confetti(50);
+    document.getElementById('rRankSlot').innerHTML=`<div class="badge new on" style="margin-top:10px">🏆 登録しました${pos?`!★${RES.rarity}で ${pos}位`:''}</div><div style="margin-top:8px"><button class="btn-ghost" style="padding:8px 16px;font-size:13px" onclick="sUI();openRank(${RES.rarity})">ランキングを見る</button></div>`;
+  }catch(e){btn.disabled=false;err.innerHTML=location.hostname.endsWith('github.io')?'送信できませんでした。通信状況を確認してもう一度お試しください':`ここでは送信できません。<a href="${SITE_URL}" target="_blank" rel="noopener" style="color:#ffd27a">公開サイト</a>から遊ぶと登録できます`}
+};
+document.getElementById('regName').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('regSend').click()});
+document.querySelectorAll('#rankTabs button').forEach(b=>b.onclick=()=>{sUI();loadRank(+b.dataset.r)});
+document.getElementById('rankBack').onclick=()=>{sUI();if(rankFrom==='result')show('result');else toTitle()};
+function openRank(r){rankFrom=CUR==='rank'?rankFrom:CUR;show('rank');loadRank(r||0)}
+async function loadRank(r){
+  rankTab=r;document.querySelectorAll('#rankTabs button').forEach(b=>b.classList.toggle('sel',+b.dataset.r===r));
+  const el=document.getElementById('rankList');el.innerHTML='<div class="rank-msg">読み込み中…</div>';
+  try{
+    const q='select=id,name,species,part,rarity,score,exposure,durability,created_at'+(r?`&rarity=eq.${r}`:'')+'&order=score.desc,durability.desc,created_at.asc&limit=50';
+    const rows=await (await sbGet(q)).json();
+    if(rankTab!==r)return;
+    if(!rows.length){el.innerHTML='<div class="rank-msg">まだ誰も登録していません。<br>一番乗りを目指そう!</div>';return}
+    el.innerHTML=rows.map((x,i)=>{const sp=SPECIES[x.species]||{n:'?',r:x.rarity},d=new Date(x.created_at),no=i+1;
+      return `<div class="rk-row${myIds.includes(x.id)?' me':''}"><div class="rk-no${no<=3?' g'+no:''}">${no}</div><img src="${thumbURL(x.species,x.part)}" alt="">
+        <div class="rk-main"><div class="rk-name">${esc(x.name)}${myIds.includes(x.id)?' <span style="font-size:11px;color:#f0b44c">(あなた)</span>':''}</div><div class="rk-sub">${'★'.repeat(sp.r)} ${esc(sp.n)}の${PARTS[x.part]||''} ・ ${d.getMonth()+1}/${d.getDate()}</div></div>
+        <div class="rk-score">${x.score}<small>${rankOf(x.score)}・耐久${x.durability}</small></div></div>`}).join('');
+  }catch(e){
+    el.innerHTML=location.hostname.endsWith('github.io')?'<div class="rank-msg">ランキングを読み込めませんでした。<br>通信状況を確認してください。</div>':
+      `<div class="rank-msg">このページではランキングを表示できません。<br><a href="${SITE_URL}" target="_blank" rel="noopener">公開サイト</a>から遊ぶと見られます。</div>`;
+  }
 }
 
 // ================= メインループ =================
