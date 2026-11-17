@@ -188,6 +188,8 @@ button:active{transform:scale(.96)}
 .rk-score small{display:block;font-family:"M PLUS Rounded 1c";font-size:11px;color:var(--amber);font-weight:800}
 .rank-msg{text-align:center;color:var(--sub);font-size:14px;line-height:1.7;padding:30px 10px}
 .rank-msg a{color:var(--amber2)}
+.btn-x{display:inline-flex;align-items:center;gap:8px;margin-top:10px;font-size:14px;font-weight:800;padding:10px 18px;border-radius:99px;background:#000;color:#fff;border:1px solid rgba(255,255,255,.25);text-decoration:none}
+.btn-x svg{width:15px;height:15px}
 .btn-rank{margin-top:10px;font-size:15px;padding:11px 20px;border-radius:99px;background:linear-gradient(180deg,#6a4c2a,#4a3420);border:1px solid var(--amber);color:var(--cream);font-weight:800;box-shadow:0 0 16px rgba(240,180,76,.2)}
 .name-in{width:100%;font:inherit;font-size:18px;font-weight:700;padding:13px 14px;border-radius:14px;border:1px solid var(--line);background:#15100d;color:var(--cream);outline:none;-webkit-user-select:text;user-select:text}
 .name-in:focus{border-color:var(--amber)}
@@ -258,6 +260,7 @@ button:active{transform:scale(.96)}
     <div id="rBadge"></div>
     <div class="r-detail" id="rDetail"></div>
     <div id="rRankSlot"></div>
+    <div id="rShareSlot"></div>
     <div class="r-btns"><button class="btn-primary" onclick="sUI();toSelect()">次の岩へ</button><button class="btn-ghost" onclick="sUI();openDex()">図鑑</button></div>
   </section>
 
@@ -275,7 +278,7 @@ button:active{transform:scale(.96)}
   <section class="screen" id="s-rank">
     <div class="bar">
       <button class="icon-btn" id="rankBack">‹</button>
-      <div class="bar-title">綺麗な化石ランキング</div>
+      <div class="bar-title">綺麗な化石ランキング <span style="font-size:13px;color:var(--sub)">TOP10</span></div>
     </div>
     <div class="tabs" id="rankTabs"><button data-r="0" class="sel">総合</button><button data-r="1">★1</button><button data-r="2">★2</button><button data-r="3">★3</button><button data-r="4">★4</button></div>
     <div class="rank-list" id="rankList"></div>
@@ -946,7 +949,7 @@ function showResult(){
   document.getElementById('rName').textContent=sp.n+'の'+part;
   document.getElementById('rDetail').textContent=`露出 ${Math.floor(exp*100)}% ・ 残り耐久 ${Math.floor(durR*100)}%`;
   const row=document.getElementById('rScoreRow'),stamp=document.getElementById('stamp'),badge=document.getElementById('rBadge');
-  stamp.className='stamp';badge.innerHTML='';RES=null;document.getElementById('rRankSlot').innerHTML='';document.getElementById('rScore').textContent='0';
+  stamp.className='stamp';badge.innerHTML='';RES=null;SHARE=null;document.getElementById('rRankSlot').innerHTML='';document.getElementById('rShareSlot').innerHTML='';document.getElementById('rScore').textContent='0';
   // 化石の絵
   const dm=G.cellDmg;const fc=renderFossil(G.domeHi,D,FMARGIN,(x,y)=>{const r0=BI0[y]*SIM,r1=BI1[y]*SIM,i0=BI0[x],i1=BI1[x],fx=BF[x],fy=BF[y];
     const t=(dm[r0+i0]+(dm[r0+i1]-dm[r0+i0])*fx)*(1-fy)+(dm[r1+i0]+(dm[r1+i1]-dm[r1+i0])*fx)*fy;return t>0.002?Math.min(1,t/DMGFULL):0});
@@ -960,6 +963,7 @@ function showResult(){
       c2.moveTo(cx,cy);c2.arc(cx,cy,rc.width,a0,a1);c2.closePath();c2.clip();const m=(a0+a1)/2;c2.translate(Math.cos(m)*10*dpr,Math.sin(m)*10*dpr);c2.rotate((rnd()-0.5)*0.12);
       c2.drawImage(fc,bx0-4,by0-4,bw,bh,ox,oy,dw,dh);c2.restore()}
   }else c2.drawImage(fc,bx0-4,by0-4,bw,bh,ox,oy,dw,dh);
+  SHARE={species:G.rock.sp,part:G.rock.part,reason,ok,score,pos:null};renderShare();
   if(!ok){const msg=reason==='broken'?'化石が砕けてしまった…':(reason==='time'?'時間切れ。':'')+'掘り出しが足りなかった…';
     row.innerHTML=`<div style="display:flex;flex-direction:column;align-items:center;gap:6px"><div class="r-fail">${msg}</div>${reason==='broken'?'':'<div class="r-detail">成功には露出60%以上が必要です</div>'}</div>`;return}
   row.innerHTML='<div class="r-score"><span id="rScore">0</span><small>点</small></div><div class="stamp" id="stamp"></div>';
@@ -1010,6 +1014,20 @@ function openDex(){
   show('dex');
 }
 
+// ================= X共有 =================
+let SHARE=null;
+function shareText(){
+  if(!SHARE)return'';const sp=SPECIES[SHARE.species],what=`${'★'.repeat(sp.r)}${sp.n}の${PARTS[SHARE.part]}`;
+  if(SHARE.reason==='broken')return `化石採掘で${what}を掘っていたら…砕けてしまった💥\n#化石採掘`;
+  if(!SHARE.ok)return `化石採掘で${what}に挑戦したけど、掘り出しきれなかった…⛏️\n#化石採掘`;
+  return `化石採掘で${what}を${SHARE.score}点(${rankOf(SHARE.score)}ランク)で掘り出した!🦴`+(SHARE.pos?`\n綺麗な化石ランキング★${sp.r}で${SHARE.pos}位🏆`:'')+`\n#化石採掘`;
+}
+function renderShare(){
+  const slot=document.getElementById('rShareSlot');if(!SHARE){slot.innerHTML='';return}
+  const url='https://x.com/intent/tweet?text='+encodeURIComponent(shareText())+'&url='+encodeURIComponent(SITE_URL);
+  slot.innerHTML=`<a class="btn-x" href="${url}" target="_blank" rel="noopener" onclick="sUI()"><svg viewBox="0 0 24 24" fill="#fff"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>Xで共有</a>`;
+}
+
 // ================= ランキング(Supabase) =================
 const SB_URL='https://ehbdcbdbvwacddcozgno.supabase.co',SB_KEY='sb_publishable_ULeF5AycXtkj3zisHOePag_6bE4Aq9c';
 const SITE_URL='https://pani1208.github.io/kaseki-saikutsu/';
@@ -1049,7 +1067,7 @@ document.getElementById('regSend').onclick=async()=>{
     // 順位を数える
     let pos=null;try{const q=`select=id&rarity=eq.${RES.rarity}&or=(score.gt.${RES.score},and(score.eq.${RES.score},durability.gt.${RES.durability}))`;
       const c=await sbGet(q,{'Prefer':'count=exact','Range':'0-0'});const cr=c.headers.get('content-range');if(cr&&cr.includes('/'))pos=+cr.split('/')[1]+1}catch(e){}
-    closeReg();sFanfare(false);confetti(50);
+    closeReg();sFanfare(false);confetti(50);if(SHARE){SHARE.pos=pos;renderShare()}
     document.getElementById('rRankSlot').innerHTML=`<div class="badge new on" style="margin-top:10px">🏆 登録しました${pos?`!★${RES.rarity}で ${pos}位`:''}</div><div style="margin-top:8px"><button class="btn-ghost" style="padding:8px 16px;font-size:13px" onclick="sUI();openRank(${RES.rarity})">ランキングを見る</button></div>`;
   }catch(e){btn.disabled=false;err.innerHTML=location.hostname.endsWith('github.io')?'送信できませんでした。通信状況を確認してもう一度お試しください':`ここでは送信できません。<a href="${SITE_URL}" target="_blank" rel="noopener" style="color:#ffd27a">公開サイト</a>から遊ぶと登録できます`}
 };
@@ -1061,7 +1079,7 @@ async function loadRank(r){
   rankTab=r;document.querySelectorAll('#rankTabs button').forEach(b=>b.classList.toggle('sel',+b.dataset.r===r));
   const el=document.getElementById('rankList');el.innerHTML='<div class="rank-msg">読み込み中…</div>';
   try{
-    const q='select=id,name,species,part,rarity,score,exposure,durability,created_at'+(r?`&rarity=eq.${r}`:'')+'&order=score.desc,durability.desc,created_at.asc&limit=50';
+    const q='select=id,name,species,part,rarity,score,exposure,durability,created_at'+(r?`&rarity=eq.${r}`:'')+'&order=score.desc,durability.desc,created_at.asc&limit=10';
     const rows=await (await sbGet(q)).json();
     if(rankTab!==r)return;
     if(!rows.length){el.innerHTML='<div class="rank-msg">まだ誰も登録していません。<br>一番乗りを目指そう!</div>';return}
