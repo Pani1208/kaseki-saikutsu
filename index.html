@@ -1125,7 +1125,10 @@ function showResultInner(){
   document.getElementById('rStars').textContent='★'.repeat(sp.r)+'☆'.repeat(4-sp.r);
   document.getElementById('rName').textContent=sp.n+'の'+part;
   document.getElementById('rDetail').textContent=`露出 ${Math.floor(exp*100)}% ・ 残り耐久 ${Math.floor(durR*100)}%`;
-  const row=document.getElementById('rScoreRow'),stamp=document.getElementById('stamp'),badge=document.getElementById('rBadge');
+  const row=document.getElementById('rScoreRow');
+  // 前回が失敗だと点数とハンコの部品が消えているので、毎回作り直す
+  row.innerHTML='<div class="r-score"><span id="rScore">0</span><small>点</small></div><div class="stamp" id="stamp"></div>';
+  const stamp=document.getElementById('stamp'),badge=document.getElementById('rBadge');
   stamp.className='stamp';badge.innerHTML='';document.getElementById('rParts').innerHTML='';RES=null;SHARE=null;document.getElementById('rRankSlot').innerHTML='';document.getElementById('rShareSlot').innerHTML='';document.getElementById('rScore').textContent='0';
   // 化石の絵
   const dm=G.cellDmg;const fc=renderFossil(G.domeHi,D,FMARGIN,(x,y)=>{const r0=BI0[y]*SIM,r1=BI1[y]*SIM,i0=BI0[x],i1=BI1[x],fx=BF[x],fy=BF[y];
