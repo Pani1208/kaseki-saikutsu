@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>化石採掘</title>
+<meta name="description" content="岩を削って恐竜の化石を掘り出そう。ハンマーとドリルを使い分けて、傷つけずに掘り出せるか？">
+<meta property="og:title" content="化石採掘">
+<meta property="og:description" content="岩を削って恐竜の化石を掘り出すブラウザゲーム">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#16110e">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦴</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=M+PLUS+Rounded+1c:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#16110e;--panel:#241c17;--panel2:#33291f;--line:rgba(255,220,170,.09);--text:#f4ece0;--sub:#a99a8a;--amber:#f0b44c;--amber2:#ffd27a;--cream:#f2e5cb;--purple:#b468f2;--red:#ef6a5e}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+html,body{height:100%;background:#0e0a08;color:var(--text);font-family:"M PLUS Rounded 1c",system-ui,-apple-system,"Hiragino Sans",sans-serif;overflow:hidden}
+#app{position:relative;width:100%;max-width:480px;height:100%;height:100dvh;margin:0 auto;background:var(--bg);overflow:hidden}
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;opacity:0;pointer-events:none;transition:opacity .35s ease,transform .35s ease;transform:scale(1.02);overflow-y:auto;overflow-x:hidden}
+.screen.active{opacity:1;pointer-events:auto;transform:none}
+button{font:inherit;color:inherit;border:none;background:none;cursor:pointer}
+button:active{transform:scale(.96)}
+.dela{font-family:"Dela Gothic One",sans-serif;font-weight:400}
+
+/* 共通ボタン */
+.btn-primary{background:linear-gradient(180deg,#ffc960,#e79c2c);color:#2b1806;font-weight:800;font-size:18px;padding:15px 20px;border-radius:16px;box-shadow:0 5px 0 #9b5f14,0 10px 24px rgba(240,160,60,.25);letter-spacing:.06em}
+.btn-primary:active{transform:translateY(3px);box-shadow:0 2px 0 #9b5f14}
+.btn-ghost{background:rgba(255,235,200,.07);border:1px solid var(--line);color:var(--text);font-weight:700;font-size:15px;padding:12px 18px;border-radius:14px}
+.icon-btn{width:40px;height:40px;border-radius:12px;background:rgba(255,235,200,.08);border:1px solid var(--line);display:grid;place-items:center;font-size:18px;font-weight:800;color:var(--cream)}
+#sndBtn{position:absolute;top:12px;right:12px;z-index:50}
+#sndBtn svg{width:20px;height:20px}
+
+/* タイトル */
+#s-title{justify-content:flex-end;overflow:hidden}
+#titleBg{position:absolute;inset:0;width:100%;height:100%}
+.title-wrap{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:14px;padding:0 28px 9vh}
+.logo{display:flex;flex-direction:column;align-items:center;margin-bottom:6vh;transform:rotate(-3deg)}
+.logo-sub{font-family:"Dela Gothic One";font-size:13px;letter-spacing:.42em;color:var(--amber2);opacity:.85;margin-bottom:4px;text-shadow:0 2px 6px rgba(0,0,0,.8)}
+.logo-main{display:flex;flex-direction:column;align-items:center;line-height:1.02;filter:drop-shadow(0 5px 0 #2a160a) drop-shadow(0 14px 22px rgba(0,0,0,.7))}
+.logo-main span{font-family:"Dela Gothic One";background:linear-gradient(180deg,#fff6dc 0%,#f6d58c 45%,#d98f2b 100%);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-stroke:2px #4a2810;paint-order:stroke fill}
+.logo-main .l1{font-size:58px;letter-spacing:.12em}
+.logo-main .l2{font-size:86px;letter-spacing:.06em;margin-top:-4px}
+.logo-bone{width:230px;height:26px;margin-top:6px;opacity:.9}
+.title-progress{font-size:13px;color:#d8c8b0;background:rgba(10,6,4,.55);padding:6px 14px;border-radius:99px;border:1px solid var(--line)}
+#btnStart{width:100%;max-width:300px;font-size:21px;padding:17px;animation:breathe 2.2s ease-in-out infinite}
+@keyframes breathe{0%,100%{box-shadow:0 5px 0 #9b5f14,0 0 0 rgba(255,200,90,0)}50%{box-shadow:0 5px 0 #9b5f14,0 0 34px rgba(255,200,90,.55)}}
+.title-wrap .btn-ghost{width:100%;max-width:300px;background:rgba(10,6,4,.5)}
+
+/* 岩選び(作業台) */
+#s-select{background:radial-gradient(120% 70% at 50% 18%,rgba(255,196,110,.28),rgba(255,170,80,0) 60%),repeating-linear-gradient(92deg,rgba(0,0,0,.08) 0 2px,rgba(0,0,0,0) 2px 9px),repeating-linear-gradient(89deg,rgba(255,220,170,.035) 0 1px,rgba(0,0,0,0) 1px 23px),linear-gradient(180deg,#4a3020,#3a2418 55%,#24160e);padding:14px 16px 22px;gap:14px}
+#s-select::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(130% 90% at 50% 30%,rgba(0,0,0,0) 45%,rgba(0,0,0,.6))}
+.bar{display:flex;align-items:center;gap:10px;position:relative;z-index:2;padding-right:50px}
+.bar-title{font-family:"Dela Gothic One";font-size:20px;flex:1;text-shadow:0 2px 8px rgba(0,0,0,.6)}
+.chip{align-self:flex-start;font-size:12.5px;color:#e6d6bd;background:rgba(0,0,0,.35);padding:5px 12px;border-radius:99px;position:relative;z-index:2}
+.lamp{position:relative;z-index:2;text-align:center;font-size:13px;color:#e8d4b4;opacity:.85;margin-top:4px;margin-bottom:auto}
+.rocks{position:relative;z-index:2;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:auto;padding:30px 10px 24px;border-radius:22px;background:radial-gradient(90% 80% at 50% 40%,#3a4a45,#26332f);box-shadow:inset 0 0 0 2px rgba(0,0,0,.25),inset 0 0 0 7px #2c3a36,inset 0 0 0 8px rgba(255,240,210,.18),inset 0 0 40px rgba(0,0,0,.5),0 14px 30px rgba(0,0,0,.45);}
+.rock-slot{display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;transition:transform .45s cubic-bezier(.2,.9,.3,1.2),opacity .3s}
+.rock-slot .rk{position:relative;width:100%;aspect-ratio:1;display:grid;place-items:center}
+.rock-slot canvas{width:100%;height:100%;transition:transform .2s}
+.rock-slot:active canvas{transform:scale(.94)}
+.rk.r2 canvas{filter:drop-shadow(0 0 10px rgba(110,170,255,.65))}
+.rk.r3 canvas{filter:drop-shadow(0 0 14px rgba(255,205,90,.85))}
+.rk.r4 canvas{animation:glow4 1.1s ease-in-out infinite}
+@keyframes glow4{0%,100%{filter:drop-shadow(0 0 12px rgba(255,120,60,.7))}50%{filter:drop-shadow(0 0 26px rgba(255,200,80,1))}}
+.rk.r4{animation:wobble 2.4s ease-in-out infinite}
+@keyframes wobble{0%,100%{transform:rotate(0)}10%{transform:rotate(-3deg)}20%{transform:rotate(3deg)}30%{transform:rotate(0)}}
+.spark{position:absolute;width:8px;height:8px;pointer-events:none;background:radial-gradient(circle,#fff 0,#fff 20%,rgba(255,230,150,.9) 35%,rgba(255,200,80,0) 70%);border-radius:50%;animation:twinkle 1.6s ease-in-out infinite}
+.rk.r2 .spark{background:radial-gradient(circle,#fff 0,#fff 20%,rgba(150,200,255,.9) 35%,rgba(100,160,255,0) 70%)}
+@keyframes twinkle{0%,100%{opacity:0;transform:scale(.3) translateY(4px)}50%{opacity:1;transform:scale(1.2) translateY(-6px)}}
+.tag{font-size:11.5px;line-height:1.35;text-align:center;color:#3b2a1a;background:linear-gradient(180deg,#efe2c6,#d9c7a3);padding:6px 6px;border-radius:6px;box-shadow:0 2px 0 rgba(0,0,0,.35);min-height:42px;display:grid;place-items:center;width:100%;transform:rotate(-1.5deg)}
+.rock-slot:nth-child(2) .tag{transform:rotate(1.2deg)}
+.rock-slot.chosen{transform:translateY(-14px) scale(1.18);z-index:3}
+.rock-slot.fade{opacity:0;transform:scale(.9)}
+.select-foot{position:relative;z-index:2;display:flex;flex-direction:column;gap:10px}
+
+/* クリーニング */
+#s-clean{padding:12px 12px 18px;gap:10px;background:radial-gradient(120% 60% at 50% 35%,#2c221b,#140f0c)}
+.hud{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center;padding-right:50px;min-height:40px}
+.timer{display:flex;align-items:center;gap:6px;font-family:"Dela Gothic One";font-size:24px;font-variant-numeric:tabular-nums;min-width:74px;color:var(--cream)}
+.timer svg{width:20px;height:20px;opacity:.8}
+.timer.low{color:var(--red);animation:tpulse .5s ease-in-out infinite alternate}
+@keyframes tpulse{to{transform:scale(1.08)}}
+.bars{display:flex;flex-direction:column;gap:6px}
+.bar-row{display:grid;grid-template-columns:30px 1fr 38px;align-items:center;gap:6px;font-size:11px;color:var(--sub);font-weight:700}
+.gauge{position:relative;height:11px;background:#0b0806;border-radius:6px;overflow:hidden;box-shadow:inset 0 1px 2px rgba(0,0,0,.8),0 0 0 1px rgba(255,230,190,.06)}
+.gauge>b{position:absolute;inset:0 auto 0 0;background:linear-gradient(180deg,#fff3d8,#d9c194);border-radius:6px;transition:width .12s}
+.gauge.danger>b{background:linear-gradient(180deg,#d59bff,#8e3fd0);animation:blink .45s steps(2) infinite}
+.gauge.hit{animation:ghit .3s}
+@keyframes ghit{0%{box-shadow:0 0 0 2px var(--purple),0 0 14px var(--purple)}100%{box-shadow:inset 0 1px 2px rgba(0,0,0,.8)}}
+@keyframes blink{50%{opacity:.5}}
+.gauge.exp>b{background:linear-gradient(180deg,#ffd987,#e89a2e)}
+.gauge i{position:absolute;top:0;bottom:0;width:2px;background:rgba(255,255,255,.18);transition:background .3s}
+.gauge i.on{background:#fff;box-shadow:0 0 8px #ffd27a}
+.bar-row .val{text-align:right;color:var(--cream);font-variant-numeric:tabular-nums}
+.board-wrap{position:relative;width:100%;aspect-ratio:1;border-radius:18px;overflow:hidden;background:#24292b;box-shadow:0 10px 30px rgba(0,0,0,.6)}
+.board-wrap.intro{animation:bintro .5s cubic-bezier(.2,.9,.3,1.1)}
+@keyframes bintro{from{transform:scale(.86);opacity:0}to{transform:none;opacity:1}}
+#board{position:absolute;inset:0;width:100%;height:100%;touch-action:none;display:block}
+.board-frame{position:absolute;inset:0;pointer-events:none;border-radius:18px;box-shadow:inset 0 0 0 1px rgba(255,230,190,.08),inset 0 0 40px rgba(0,0,0,.55)}
+.float-layer{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.ftxt{position:absolute;transform:translate(-50%,-50%);font-family:"Dela Gothic One";font-size:20px;color:#fff;white-space:nowrap;text-shadow:0 2px 0 rgba(0,0,0,.7),0 0 12px rgba(255,210,120,.8);animation:fup 1.1s ease-out forwards}
+.ftxt.purple{color:#e7c6ff;text-shadow:0 2px 0 rgba(0,0,0,.7),0 0 12px rgba(180,100,240,.9);font-size:17px}
+@keyframes fup{0%{opacity:0;transform:translate(-50%,-30%) scale(.6)}15%{opacity:1;transform:translate(-50%,-50%) scale(1.15)}30%{transform:translate(-50%,-55%) scale(1)}100%{opacity:0;transform:translate(-50%,-120%)}}
+.tools{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.tool{position:relative;display:flex;flex-direction:column;align-items:center;gap:5px;padding:14px 4px 11px;border-radius:14px;background:linear-gradient(180deg,#2f261f,#231b16);border:1px solid var(--line);font-size:12px;font-weight:700;color:var(--sub);transition:all .15s}
+.tool svg{width:40px;height:40px}
+.tool.sel{background:linear-gradient(180deg,#5a4126,#3a2a1b);border-color:var(--amber);color:var(--cream);box-shadow:0 0 0 1px var(--amber),0 6px 18px rgba(240,170,70,.25);transform:translateY(-2px)}
+.pw{display:flex;gap:3px}
+.pw i{width:7px;height:4px;border-radius:2px;background:#4b3d30}
+.pw i.on{background:var(--amber)}
+.btn-end{margin-top:auto;align-self:center;font-size:14px;font-weight:700;color:var(--sub);padding:9px 22px;border-radius:99px;border:1px solid var(--line);background:rgba(255,235,200,.04)}
+
+/* 結果 */
+#s-result{padding:18px 16px 22px;gap:8px;align-items:center;background:radial-gradient(90% 50% at 50% 28%,#3a2c20,#140f0c 75%)}
+.result-stage{position:relative;width:90%;aspect-ratio:1.1;display:grid;place-items:center;margin-top:auto}
+.result-stage .spot{position:absolute;inset:-6%;background:radial-gradient(closest-side,rgba(255,210,140,.28),rgba(255,210,140,0));border-radius:50%}
+.result-stage .felt{position:absolute;inset:6% 2%;border-radius:18px;background:radial-gradient(circle at 50% 40%,#30383a,#1d2224);box-shadow:inset 0 0 30px rgba(0,0,0,.6),0 10px 30px rgba(0,0,0,.5)}
+#resultCanvas{position:relative;width:100%;height:100%}
+.r-stars{color:var(--amber);font-size:16px;letter-spacing:3px;min-height:20px}
+.r-name{font-family:"Dela Gothic One";font-size:24px;text-align:center;line-height:1.25}
+.r-score-row{position:relative;display:flex;align-items:center;justify-content:center;gap:18px;min-height:86px}
+.r-score{font-family:"Dela Gothic One";font-size:56px;line-height:1;color:var(--cream);font-variant-numeric:tabular-nums}
+.r-score small{font-size:20px;margin-left:2px}
+.stamp{width:78px;height:78px;border-radius:50%;border:5px solid #e0473c;color:#e0473c;display:grid;place-items:center;font-family:"Dela Gothic One";font-size:42px;transform:rotate(-14deg) scale(0);opacity:0;box-shadow:inset 0 0 0 3px rgba(224,71,60,.35)}
+.stamp.on{animation:stampin .38s cubic-bezier(.3,1.6,.5,1) forwards}
+.stamp.S{border-color:#f0b44c;color:#f0b44c;box-shadow:inset 0 0 0 3px rgba(240,180,76,.35),0 0 24px rgba(240,180,76,.5)}
+@keyframes stampin{0%{transform:rotate(-14deg) scale(3);opacity:0}60%{opacity:1}100%{transform:rotate(-14deg) scale(1);opacity:1}}
+.r-fail{font-family:"Dela Gothic One";font-size:22px;color:#d9a8ff;text-align:center;text-shadow:0 0 18px rgba(180,100,240,.6)}
+.badge{display:inline-block;padding:6px 14px;border-radius:99px;font-size:14px;font-weight:800;opacity:0;transform:translateY(8px);transition:all .3s}
+.badge.on{opacity:1;transform:none}
+.badge.new{background:linear-gradient(180deg,#ffd27a,#f0a83c);color:#2b1806;box-shadow:0 0 20px rgba(255,200,90,.5)}
+.badge.up{background:#3f8a55;color:#fff}
+.badge.keep{background:var(--panel2);color:var(--sub)}
+.r-detail{font-size:13px;color:var(--sub)}
+.r-btns{display:flex;gap:10px;width:100%;margin-top:auto;padding-top:10px}
+.r-btns .btn-primary{flex:1.6}.r-btns .btn-ghost{flex:1}
+
+/* 図鑑 */
+#s-dex{padding:14px 14px 24px;gap:12px;background:linear-gradient(180deg,#221a14,#15100c)}
+.dex{display:flex;flex-direction:column;gap:10px}
+.dex-item{background:linear-gradient(180deg,#2b221b,#211a15);border:1px solid var(--line);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:10px}
+.dex-item.done{border-color:rgba(240,180,76,.7);box-shadow:0 0 0 1px rgba(240,180,76,.3),0 0 22px rgba(240,180,76,.12)}
+.dex-head{display:flex;justify-content:space-between;align-items:center}
+.dex-head .nm{font-family:"Dela Gothic One";font-size:16px}
+.dex-head .st{color:var(--amber);font-size:12px;letter-spacing:2px}
+.parts{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.part{background:#15100d;border-radius:10px;padding:5px 2px 6px;text-align:center;font-size:11px;color:#6d6155;display:flex;flex-direction:column;align-items:center;gap:2px}
+.part img{width:100%;aspect-ratio:1;object-fit:contain;filter:drop-shadow(0 2px 2px rgba(0,0,0,.6))}
+.part .q{width:100%;aspect-ratio:1;display:grid;place-items:center;font-family:"Dela Gothic One";font-size:20px;color:#3a3029}
+.part.got{background:#2c3335;color:var(--cream)}
+.part b{font-size:13px}
+.dex-done{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--amber);font-weight:800}
+.dex-done button{font-size:12px;padding:6px 12px;border-radius:99px;background:rgba(240,180,76,.15);color:var(--amber2);font-weight:800}
+
+/* オーバーレイ */
+.overlay{position:absolute;inset:0;z-index:60;background:rgba(8,5,3,.78);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .3s}
+.overlay.on{opacity:1;pointer-events:auto}
+.modal{width:100%;background:linear-gradient(180deg,#2e241c,#211912);border:1px solid var(--line);border-radius:20px;padding:20px 18px;display:flex;flex-direction:column;gap:12px;transform:translateY(12px);transition:transform .3s}
+.overlay.on .modal{transform:none}
+.modal h3{font-family:"Dela Gothic One";font-size:20px;text-align:center}
+.how{display:flex;gap:12px;align-items:center;font-size:13.5px;line-height:1.55;color:#ddd0bd}
+.how .ic{flex:0 0 46px;height:46px;border-radius:12px;background:#1a1410;display:grid;place-items:center}
+.how .ic svg{width:32px;height:32px}
+.how b{color:var(--cream)}
+.asm-stage{position:relative;width:100%;aspect-ratio:1.35;border-radius:16px;background:radial-gradient(circle at 50% 45%,#34403f,#1c2223);overflow:hidden;box-shadow:inset 0 0 30px rgba(0,0,0,.6)}
+.asm-stage canvas{position:absolute;transition:transform .7s cubic-bezier(.2,.9,.3,1.15),opacity .4s}
+.asm-title{font-family:"Dela Gothic One";font-size:24px;text-align:center;background:linear-gradient(180deg,#fff3d0,#f0b44c);-webkit-background-clip:text;background-clip:text;color:transparent}
+.asm-name{text-align:center;font-weight:800;color:var(--cream)}
+#fx{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:55}
+</style>
+</head>
+<body>
+<div id="app">
+  <button class="icon-btn" id="sndBtn" aria-label="サウンド"></button>
+
+  <!-- タイトル -->
+  <section class="screen active" id="s-title">
+    <canvas id="titleBg"></canvas>
+    <div class="title-wrap">
+      <div class="logo">
+        <div class="logo-sub">FOSSIL EXCAVATION</div>
+        <div class="logo-main"><span class="l1">化石</span><span class="l2">採掘</span></div>
+        <svg class="logo-bone" viewBox="0 0 230 26"><defs><linearGradient id="bg1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff6dc"/><stop offset="1" stop-color="#d9b77a"/></linearGradient></defs><g fill="url(#bg1)" stroke="#4a2810" stroke-width="2"><path d="M22 9 H208 a7 7 0 1 1 6 9 a7 7 0 1 1 -6 1 H22 a7 7 0 1 1 -6 -1 a7 7 0 1 1 6 -9z"/></g></svg>
+      </div>
+      <div class="title-progress" id="titleProgress"></div>
+      <button class="btn-primary" id="btnStart">はじめる</button>
+      <button class="btn-ghost" onclick="sUI();openDex()">図鑑</button>
+    </div>
+  </section>
+
+  <!-- 岩選び -->
+  <section class="screen" id="s-select">
+    <div class="bar">
+      <button class="icon-btn" onclick="sUI();toTitle()">‹</button>
+      <div class="bar-title">岩をひとつ選ぼう</div>
+      <button class="icon-btn" onclick="sUI();showHowto()">?</button>
+    </div>
+    <div class="chip" id="progressText"></div>
+    <div class="rocks" id="rocks"></div>
+    <div class="lamp">光っている岩ほどレア。そのぶん化石はもろい</div>
+    <div class="select-foot"><button class="btn-ghost" onclick="sUI();openDex()">図鑑を見る</button></div>
+  </section>
+
+  <!-- クリーニング -->
+  <section class="screen" id="s-clean">
+    <div class="hud">
+      <div class="timer" id="timer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2h6"/></svg><span id="time">90</span></div>
+      <div class="bars">
+        <div class="bar-row"><span>耐久</span><div class="gauge" id="gauge"><b id="gaugeBar" style="width:100%"></b></div><span class="val" id="durTxt">100</span></div>
+        <div class="bar-row"><span>露出</span><div class="gauge exp" id="expGauge"><b id="expBar" style="width:0%"></b><i style="left:25%"></i><i style="left:50%"></i><i style="left:75%"></i></div><span class="val" id="expTxt">0%</span></div>
+      </div>
+    </div>
+    <div class="board-wrap" id="boardWrap"><canvas id="board"></canvas><div class="board-frame"></div><div class="float-layer" id="floatLayer"></div></div>
+    <div class="tools">
+      <button class="tool sel" data-tool="hammer"><svg viewBox="0 0 40 40"><path d="M21 17 L33 33" stroke="#8a5a32" stroke-width="5" stroke-linecap="round"/><path d="M21 17 L33 33" stroke="#b37a45" stroke-width="2" stroke-linecap="round"/><rect x="6" y="7" width="22" height="11" rx="2.5" transform="rotate(38 17 12.5)" fill="#9aa3ab" stroke="#3b4248" stroke-width="1.6"/><rect x="7" y="8.5" width="20" height="3" rx="1.5" transform="rotate(38 17 12.5)" fill="#d6dde2"/></svg>ハンマー<div class="pw" style="visibility:hidden"><i></i></div></button>
+      <button class="tool" data-tool="d1"><svg viewBox="0 0 40 40"><rect x="5" y="14" width="17" height="12" rx="4" fill="#c4502f" stroke="#5a2414" stroke-width="1.6"/><rect x="21" y="16.5" width="6" height="7" fill="#7d858c" stroke="#3b4248" stroke-width="1.4"/><path d="M27 18 L37 20 L27 22z" fill="#c9d0d6" stroke="#3b4248" stroke-width="1.2"/><path d="M8 26 L10 34 H16 L15 26" fill="#8f3a22"/></svg>ドリル<div class="pw"><i class="on"></i><i></i><i></i></div></button>
+      <button class="tool" data-tool="d2"><svg viewBox="0 0 40 40"><rect x="5" y="14" width="17" height="12" rx="4" fill="#c4502f" stroke="#5a2414" stroke-width="1.6"/><rect x="21" y="16" width="6" height="8" fill="#7d858c" stroke="#3b4248" stroke-width="1.4"/><path d="M27 16.5 L37 20 L27 23.5z" fill="#c9d0d6" stroke="#3b4248" stroke-width="1.2"/><path d="M8 26 L10 34 H16 L15 26" fill="#8f3a22"/></svg>ドリル<div class="pw"><i class="on"></i><i class="on"></i><i></i></div></button>
+      <button class="tool" data-tool="d3"><svg viewBox="0 0 40 40"><rect x="4" y="13" width="18" height="14" rx="4" fill="#c4502f" stroke="#5a2414" stroke-width="1.6"/><rect x="21" y="15" width="6" height="10" fill="#7d858c" stroke="#3b4248" stroke-width="1.4"/><path d="M27 15 L38 20 L27 25z" fill="#c9d0d6" stroke="#3b4248" stroke-width="1.2"/><path d="M29 17 L33 23 M31 16.5 L35 22" stroke="#7d858c" stroke-width="1"/><path d="M7 27 L9 35 H16 L15 27" fill="#8f3a22"/></svg>ドリル<div class="pw"><i class="on"></i><i class="on"></i><i class="on"></i></div></button>
+    </div>
+    <button class="btn-end" onclick="finish('manual')">ここで終える</button>
+  </section>
+
+  <!-- 結果 -->
+  <section class="screen" id="s-result">
+    <div class="result-stage"><div class="spot"></div><div class="felt"></div><canvas id="resultCanvas"></canvas></div>
+    <div class="r-stars" id="rStars"></div>
+    <div class="r-name" id="rName"></div>
+    <div class="r-score-row" id="rScoreRow"><div class="r-score"><span id="rScore">0</span><small>点</small></div><div class="stamp" id="stamp">S</div></div>
+    <div id="rBadge"></div>
+    <div class="r-detail" id="rDetail"></div>
+    <div class="r-btns"><button class="btn-primary" onclick="sUI();toSelect()">次の岩へ</button><button class="btn-ghost" onclick="sUI();openDex()">図鑑</button></div>
+  </section>
+
+  <!-- 図鑑 -->
+  <section class="screen" id="s-dex">
+    <div class="bar">
+      <button class="icon-btn" id="dexBack">‹</button>
+      <div class="bar-title">恐竜図鑑</div>
+    </div>
+    <div class="chip" id="dexProgress"></div>
+    <div class="dex" id="dex"></div>
+  </section>
+
+  <!-- 遊び方 -->
+  <div class="overlay" id="howto">
+    <div class="modal">
+      <h3>あそびかた</h3>
+      <div class="how"><div class="ic"><svg viewBox="0 0 40 40"><rect x="6" y="7" width="22" height="11" rx="2.5" transform="rotate(38 17 12.5)" fill="#9aa3ab"/><path d="M21 17 L33 33" stroke="#b37a45" stroke-width="4" stroke-linecap="round"/></svg></div><div><b>ハンマー</b>はタップ。岩をまとめて砕けるが、化石に当たると大ダメージ。黒っぽい<b>硬い岩</b>はハンマーで崩そう</div></div>
+      <div class="how"><div class="ic"><svg viewBox="0 0 40 40"><rect x="5" y="14" width="17" height="12" rx="4" fill="#c4502f"/><path d="M22 16 L37 20 L22 24z" fill="#c9d0d6"/></svg></div><div><b>ドリル</b>はなぞって削る。●が少ないほど遅いけど安全。仕上げは●1つで</div></div>
+      <div class="how"><div class="ic"><svg viewBox="0 0 40 40"><path d="M8 26c4-10 10-14 24-14" stroke="#efe2c4" stroke-width="7" stroke-linecap="round" fill="none"/><circle cx="24" cy="14" r="5" fill="#a45ee0"/></svg></div><div>化石を傷つけると<b style="color:#d9a8ff">紫</b>に変わる。耐久が0になると砕けて失敗</div></div>
+      <div class="how"><div class="ic"><svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="13" fill="none" stroke="#f0b44c" stroke-width="3"/><path d="M20 12v8l5 4" stroke="#f0b44c" stroke-width="3" stroke-linecap="round" fill="none"/></svg></div><div>時間内に化石を全部出せたら高得点。傷が少ないほど点が上がる</div></div>
+      <button class="btn-primary" onclick="sUI();hideHowto()">わかった</button>
+    </div>
+  </div>
+
+  <!-- 全身骨格 -->
+  <div class="overlay" id="assembly">
+    <div class="modal">
+      <div class="asm-title">全身骨格 完成!</div>
+      <div class="asm-stage" id="asmStage"></div>
+      <div class="asm-name" id="asmName"></div>
+      <button class="btn-primary" onclick="sUI();document.getElementById('assembly').classList.remove('on')">とじる</button>
+    </div>
+  </div>
+  <canvas id="fx"></canvas>
+</div>
+
+<script>
+// ================= データ =================
+const GAME_NAME='化石採掘';
+const SPECIES=[
+  ['プロトケラトプス',1],['オヴィラプトル',1],['プシッタコサウルス',1],['ガリミムス',1],['イグアノドン',1],['マイアサウラ',1],['コンプソグナトゥス',1],
+  ['ステゴサウルス',2],['パキケファロサウルス',2],['アンキロサウルス',2],['パラサウロロフス',2],['ディロフォサウルス',2],['アロサウルス',2],
+  ['トリケラトプス',3],['ヴェロキラプトル',3],['ブラキオサウルス',3],['カルノタウルス',3],['ディプロドクス',3],
+  ['ティラノサウルス',4],['スピノサウルス',4]
+].map(([n,r])=>({n,r}));
+const PARTS=['頭','胴','腕','脚'];
+const RAR={
+  1:{dur:60,time:120,thick:1.25,hard:1,hint:'ごつごつした<br>ふつうの岩'},
+  2:{dur:46,time:105,thick:1.05,hard:2,hint:'うっすら<br>青く光っている'},
+  3:{dur:34,time:90,thick:0.85,hard:3,hint:'金色に<br>光っている…'},
+  4:{dur:24,time:75,thick:0.7,hard:5,hint:'脈打つように<br>光っている!?'}
+};
+const TOOLS={
+  hammer:{r:5.3,pow:3.2,dmg:0.155},
+  d1:{r:1.8,rate:10,dmg:0.0015},
+  d2:{r:3.0,rate:18,dmg:0.006},
+  d3:{r:4.1,rate:30,dmg:0.023}
+};
+const SIM=96, NS=SIM*SIM, D=SIM*4, ND=D*D, FMARGIN=0.14;
+
+// ================= 保存 =================
+let dexData={},settings={snd:true,seen:false};
+try{dexData=JSON.parse(localStorage.getItem('dinoDex')||'{}')||{}}catch(e){}
+try{Object.assign(settings,JSON.parse(localStorage.getItem('dinoSet')||'{}'))}catch(e){}
+function saveDex(){try{localStorage.setItem('dinoDex',JSON.stringify(dexData))}catch(e){}}
+function saveSet(){try{localStorage.setItem('dinoSet',JSON.stringify(settings))}catch(e){}}
+
+// ================= 乱数・ノイズ =================
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const rnd=Math.random;
+function lattice(W,H,cx,cy,rng){
+  rng=rng||rnd;const gw=Math.ceil(W/cx)+2,gh=Math.ceil(H/cy)+2,g=new Float32Array(gw*gh);
+  for(let i=0;i<g.length;i++)g[i]=rng();
+  const o=new Float32Array(W*H);
+  for(let y=0;y<H;y++){const fy=y/cy,iy=fy|0,ty=fy-iy,sy=ty*ty*(3-2*ty);
+    for(let x=0;x<W;x++){const fx=x/cx,ix=fx|0,tx=fx-ix,sx=tx*tx*(3-2*tx);
+      const a=g[iy*gw+ix],b=g[iy*gw+ix+1],c=g[(iy+1)*gw+ix],d=g[(iy+1)*gw+ix+1];
+      o[y*W+x]=(a+(b-a)*sx)*(1-sy)+(c+(d-c)*sx)*sy;}}
+  return o;
+}
+
+// ================= 化石の形 =================
+function makeShape(sp,part,thick){
+  const rng=mulberry32(sp*131+part*17+7);
+  const R=(a,b)=>a+(b-a)*rng();
+  const segs=[],holes=[];
+  const S=(x1,y1,x2,y2,r,thin)=>segs.push({x1,y1,x2,y2,r:Math.max(0.013,r*(thin?thick:(0.75+0.25*thick)))});
+  if(part===0){
+    const cx=R(0.4,0.47),cy=R(0.4,0.46);
+    S(0.2,cy,cx,cy-0.02,R(0.15,0.17),false);
+    const sl=R(0.82,0.88),sy=cy+R(0,0.05);
+    S(cx,cy,sl,sy,R(0.08,0.1),false);
+    const jy=cy+R(0.17,0.21);
+    S(0.24,jy,sl-0.04,jy-0.03,0.035,true);
+    S(0.24,jy,0.26,cy+0.08,0.035,true);
+    const nt=4+Math.floor(rng()*4);
+    for(let k=0;k<nt;k++){const tx=cx+(sl-cx-0.05)*(k+0.5)/nt,ty=sy+0.075;S(tx,ty,tx+0.01,ty+R(0.04,0.07),0.016,true)}
+    if(rng()<0.6){const hx=cx+R(-0.04,0.08);S(hx,cy-0.13,hx+R(-0.06,0.08),cy-R(0.26,0.34),0.024,true)}
+    holes.push({x:cx-0.02,y:cy-0.03,r:R(0.045,0.06)},{x:sl-0.08,y:sy-0.02,r:0.024},{x:0.3,y:cy+0.03,r:0.04});
+  }else if(part===1){
+    const n=9,amp=R(0.02,0.06),ph=R(0,6),pts=[];
+    for(let k=0;k<=n;k++)pts.push([0.08+0.84*k/n,0.3+amp*Math.sin(ph+k*0.7)]);
+    for(let k=0;k<n;k++)S(pts[k][0],pts[k][1],pts[k+1][0],pts[k+1][1],0.042,false);
+    for(let k=1;k<n;k++){const[x,y]=pts[k];S(x,y,x+R(-0.01,0.01),y-R(0.05,0.08),0.016,true)}
+    for(let k=2;k<n-1;k++){
+      const[x,y]=pts[k];const len=R(0.3,0.42)*(1-Math.abs(k-n/2)/n*1.2);
+      const mx=x+0.045,my=y+len*0.5;
+      S(x,y,mx,my,0.02,true);S(mx,my,x+0.015,y+len,0.017,true);
+    }
+  }else if(part===2){
+    S(0.22,0.16,0.45,0.48,R(0.055,0.065),false);
+    S(0.45,0.48,0.6,0.7,0.036,false);
+    S(0.47,0.45,0.64,0.67,0.024,true);
+    const bx=0.63,by=0.71;
+    for(let k=0;k<3;k++){
+      const a=0.2+k*0.45+R(-0.1,0.1),len=R(0.11,0.15);
+      const mx=bx+Math.cos(a)*len*0.6,my=by+Math.sin(a)*len*0.6;
+      S(bx,by,mx,my,0.022,true);S(mx,my,bx+Math.cos(a+0.25)*len,by+Math.sin(a+0.25)*len,0.015,true);
+    }
+  }else{
+    S(0.38,0.1,0.48,0.42,R(0.065,0.08),false);
+    S(0.48,0.42,0.42,0.72,0.05,false);
+    S(0.42,0.72,0.53,0.82,0.032,false);
+    for(let k=0;k<3;k++){
+      const a=-0.3+k*0.5+R(-0.1,0.1),len=R(0.1,0.14);
+      S(0.53,0.82,0.53+Math.cos(a)*len,0.82+Math.sin(a)*len,0.018,true);
+    }
+  }
+  return {segs,holes,flip:rng()<0.5};
+}
+// 形 → なめらかな「高さ」(丸みのある骨)
+function rasterDome(shape,size,m){
+  const out=new Float32Array(size*size),sc=1-2*m;
+  const segs=shape.segs.map(s=>({...s,dx:s.x2-s.x1,dy:s.y2-s.y1,l:(s.x2-s.x1)**2+(s.y2-s.y1)**2,
+    bx0:Math.min(s.x1,s.x2)-s.r,bx1:Math.max(s.x1,s.x2)+s.r,by0:Math.min(s.y1,s.y2)-s.r,by1:Math.max(s.y1,s.y2)+s.r}));
+  for(let y=0;y<size;y++){const v=((y+0.5)/size-m)/sc;if(v<-0.05||v>1.05)continue;
+    for(let x=0;x<size;x++){let u=((x+0.5)/size-m)/sc;if(u<-0.05||u>1.05)continue;if(shape.flip)u=1-u;
+      let sd=1;
+      for(const s of segs){if(u<s.bx0||u>s.bx1||v<s.by0||v>s.by1)continue;
+        let t=s.l?((u-s.x1)*s.dx+(v-s.y1)*s.dy)/s.l:0;t=t<0?0:t>1?1:t;
+        const ex=s.x1+t*s.dx-u,ey=s.y1+t*s.dy-v,d=Math.sqrt(ex*ex+ey*ey)-s.r;if(d<sd)sd=d;}
+      if(sd<0)for(const h of shape.holes){const d=h.r-Math.hypot(u-h.x,v-h.y);if(d>sd)sd=d;}
+      if(sd<0)out[y*size+x]=1.2*Math.sqrt(Math.min(1,-sd/0.03));
+    }}
+  return out;
+}
+const P1=[198,122,238],P2=[104,28,166];
+function tint(r,g,b,t,shade){
+  if(t<=0)return[r,g,b];
+  let c;if(t<0.5){const k=t*2;c=[r+(P1[0]*shade-r)*k,g+(P1[1]*shade-g)*k,b+(P1[2]*shade-b)*k]}
+  else{const k=(t-0.5)*2;c=[P1[0]*shade+(P2[0]-P1[0])*shade*k,P1[1]*shade+(P2[1]-P1[1])*shade*k,P1[2]*shade+(P2[2]-P1[2])*shade*k]}
+  c[0]+=t*22;c[2]+=t*40;return c;
+}
+const FNZ=new Float32Array(4096);for(let i=0;i<4096;i++)FNZ[i]=Math.random()-0.5;
+const LX=-0.5,LY=-0.62,LZ=0.6,LN=Math.hypot(LX,LY,LZ),Lx=LX/LN,Ly=LY/LN,Lz=LZ/LN;
+// 化石だけを立体的に描く(結果・図鑑・タイトル用)
+function renderFossil(dome,size,m,dmgFn){
+  const cv=document.createElement('canvas');cv.width=cv.height=size;const c=cv.getContext('2d');
+  const im=c.createImageData(size,size),d=im.data;const K=5*size*(1-2*m)/(384*0.72);
+  for(let y=1;y<size-1;y++)for(let x=1;x<size-1;x++){
+    const p=y*size+x,h=dome[p],o=p*4;
+    if(h<=0){if(dome[p-1]>0||dome[p+1]>0||dome[p-size]>0||dome[p+size]>0){d[o]=30;d[o+1]=22;d[o+2]=18;d[o+3]=150}continue}
+    const gx=dome[p+1]-dome[p-1],gy=dome[p+size]-dome[p-size];
+    const nx=-gx*K,ny=-gy*K,inv=1/Math.sqrt(nx*nx+ny*ny+1),dl=(nx*Lx+ny*Ly+Lz)*inv,lit=dl>0?dl:0;
+    const shade=0.42+0.78*lit,n=FNZ[(y*131+x*71)&4095]*14;
+    let r=(238-n)*shade,g=(226-n)*shade,b=(198-n)*shade;
+    if(dmgFn){const t=dmgFn(x,y);if(t>0)[r,g,b]=tint(r,g,b,t,shade)}
+    const sp=Math.pow(lit,14)*110;d[o]=r+sp;d[o+1]=g+sp;d[o+2]=b+sp;d[o+3]=255;
+  }
+  c.putImageData(im,0,0);return cv;
+}
+
+// ================= サウンド =================
+const SND={ctx:null,master:null,nb:null,drill:null};
+function audioInit(){
+  if(SND.ctx){if(SND.ctx.state==='suspended')SND.ctx.resume();return}
+  try{const AC=window.AudioContext||window.webkitAudioContext;SND.ctx=new AC();
+    SND.master=SND.ctx.createGain();SND.master.gain.value=settings.snd?0.8:0;
+    const comp=SND.ctx.createDynamicsCompressor();SND.master.connect(comp);comp.connect(SND.ctx.destination);
+    const len=SND.ctx.sampleRate*2,b=SND.ctx.createBuffer(1,len,SND.ctx.sampleRate),ch=b.getChannelData(0);
+    for(let i=0;i<len;i++)ch[i]=Math.random()*2-1;SND.nb=b;
+  }catch(e){SND.ctx=null}
+}
+function env(g,t,a,pk,dec){g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(Math.max(0.0002,pk),t+a);g.gain.exponentialRampToValueAtTime(0.0001,t+a+dec)}
+function nz(o){if(!SND.ctx)return;const c=SND.ctx,t=c.currentTime+(o.at||0);
+  const s=c.createBufferSource();s.buffer=SND.nb;s.playbackRate.value=o.rate||1;
+  const f=c.createBiquadFilter();f.type=o.type||'lowpass';f.frequency.setValueAtTime(o.f||1000,t);if(o.f2)f.frequency.exponentialRampToValueAtTime(o.f2,t+o.dur);f.Q.value=o.q||0.7;
+  const g=c.createGain();env(g,t,o.a||0.003,o.g||0.4,o.dur);s.connect(f);f.connect(g);g.connect(SND.master);s.start(t,Math.random()*1.5);s.stop(t+o.dur+0.1)}
+function tn(o){if(!SND.ctx)return;const c=SND.ctx,t=c.currentTime+(o.at||0);
+  const s=c.createOscillator();s.type=o.type||'sine';s.frequency.setValueAtTime(o.f,t);if(o.f2)s.frequency.exponentialRampToValueAtTime(o.f2,t+o.dur);
+  const g=c.createGain();env(g,t,o.a||0.005,o.g||0.3,o.dur);s.connect(g);g.connect(SND.master);s.start(t);s.stop(t+o.dur+0.1)}
+const vr=()=>0.9+Math.random()*0.2;
+function sUI(){audioInit();tn({f:660,f2:520,dur:0.06,g:0.12,type:'triangle'})}
+function sHammer(){const v=vr();nz({f:1100*v,f2:250,dur:0.2,g:0.75});tn({f:120*v,f2:50,dur:0.16,g:0.55});nz({type:'highpass',f:3500,dur:0.03,g:0.25})}
+function sHard(){const v=vr();nz({type:'bandpass',f:2600*v,q:2,dur:0.14,g:0.6});nz({f:700,f2:200,dur:0.32,g:0.6});tn({f:190*v,f2:80,dur:0.18,g:0.25,type:'square'});nz({type:'highpass',f:5000,dur:0.02,g:0.4,at:0.04})}
+function sFossil(){tn({f:240,f2:170,dur:0.28,g:0.28,type:'triangle'});tn({f:254,f2:180,dur:0.28,g:0.18,type:'triangle'});nz({f:500,dur:0.12,g:0.3})}
+function sDing(k){const f=[880,1046.5,1318.5][k]||1318.5;tn({f,dur:1.1,g:0.22});tn({f:f*2.76,dur:0.5,g:0.05});tn({f:f*1.5,dur:0.8,g:0.06,at:0.06})}
+function sReveal(){[1318.5,1760,2093,2637].forEach((f,i)=>tn({f,dur:0.35,g:0.12,at:i*0.055}))}
+function sClear(){[523.3,659.3,784,1046.5].forEach((f,i)=>tn({f,dur:0.5,g:0.2,at:i*0.09,type:'triangle'}));[523.3,659.3,784].forEach(f=>tn({f,dur:1.4,g:0.1,at:0.4}));nz({f:800,f2:200,dur:0.8,g:0.35})}
+function sBreak(){nz({f:1800,f2:150,dur:1.3,g:0.85});tn({f:90,f2:35,dur:0.9,g:0.6});for(let i=0;i<6;i++)nz({type:'highpass',f:3000+i*500,dur:0.03,g:0.3,at:i*0.07+Math.random()*0.05})}
+function sTick(){tn({f:1500,dur:0.04,g:0.1,type:'square'})}
+function sSelect(){tn({f:170,f2:90,dur:0.14,g:0.5});nz({f:600,dur:0.12,g:0.4})}
+function sStamp(){tn({f:110,f2:45,dur:0.25,g:0.7});nz({f:900,f2:200,dur:0.18,g:0.5})}
+function sCount(){tn({f:1900+Math.random()*200,dur:0.025,g:0.05,type:'square'})}
+function sTimeUp(){tn({f:330,dur:0.5,g:0.25,type:'square'});tn({f:247,dur:0.6,g:0.25,type:'square',at:0.25})}
+function sFanfare(big){const n=big?[523.3,659.3,784,1046.5,1318.5,1568]:[784,988,1175,1568];n.forEach((f,i)=>tn({f,dur:0.4,g:0.18,at:i*0.08,type:'triangle'}));(big?[523.3,659.3,784,1046.5]:[784,988,1175]).forEach(f=>tn({f,dur:1.6,g:0.08,at:n.length*0.08}))}
+function drillOn(lv){
+  if(!SND.ctx)return;drillOff();const c=SND.ctx;
+  const s=c.createBufferSource();s.buffer=SND.nb;s.loop=true;
+  const f=c.createBiquadFilter();f.type='bandpass';f.frequency.value={d1:3800,d2:2300,d3:1250}[lv];f.Q.value={d1:2.5,d2:1.6,d3:1}[lv];
+  const am=c.createGain();am.gain.value=0.7;const lfo=c.createOscillator();lfo.frequency.value={d1:60,d2:42,d3:28}[lv];
+  const lg=c.createGain();lg.gain.value=lv==='d3'?0.6:0.35;lfo.connect(lg);lg.connect(am.gain);
+  const g=c.createGain();g.gain.value=0;s.connect(f);f.connect(am);am.connect(g);g.connect(SND.master);
+  const sq=c.createOscillator();sq.type='triangle';sq.frequency.value=lv==='d3'?540:820;const sg=c.createGain();sg.gain.value=0;sq.connect(sg);sg.connect(SND.master);
+  const hum=c.createOscillator();hum.type='sawtooth';hum.frequency.value={d1:190,d2:130,d3:85}[lv];
+  const hf=c.createBiquadFilter();hf.type='lowpass';hf.frequency.value=700;const hg=c.createGain();hg.gain.value=0;hum.connect(hf);hf.connect(hg);hg.connect(SND.master);
+  hg.gain.setTargetAtTime(0.05,c.currentTime,0.02);
+  s.start();lfo.start();sq.start();hum.start();SND.drill={s,lfo,sq,hum,g,sg,hg,lv};
+}
+function drillLevel(rate,dmg){
+  const d=SND.drill;if(!d)return;const t=SND.ctx.currentTime;
+  const mx={d1:40,d2:200,d3:600}[d.lv];
+  d.g.gain.setTargetAtTime(rate>0?0.06+Math.min(1,rate/mx)*0.4:0.0,t,0.03);
+  d.sg.gain.setTargetAtTime(dmg>0?Math.min(0.12,0.03+dmg*3):0,t,0.03);
+}
+function drillOff(){const d=SND.drill;if(!d||!SND.ctx)return;const t=SND.ctx.currentTime;
+  [d.g,d.sg,d.hg].forEach(g=>g.gain.setTargetAtTime(0,t,0.02));[d.s,d.lfo,d.sq,d.hum].forEach(n=>{try{n.stop(t+0.15)}catch(e){}});SND.drill=null}
+function setSnd(on){settings.snd=on;saveSet();if(SND.master)SND.master.gain.value=on?0.8:0;drawSndBtn()}
+function drawSndBtn(){document.getElementById('sndBtn').innerHTML=settings.snd?
+  '<svg viewBox="0 0 24 24" fill="none" stroke="#f2e5cb" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z" fill="#f2e5cb"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg>':
+  '<svg viewBox="0 0 24 24" fill="none" stroke="#a99a8a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z" fill="#a99a8a"/><path d="M17 9l5 6M22 9l-5 6"/></svg>'}
+document.getElementById('sndBtn').onclick=()=>{audioInit();setSnd(!settings.snd);if(settings.snd)sUI()};
+document.addEventListener('pointerdown',audioInit,{passive:true});
+function buzz(ms){try{navigator.vibrate&&navigator.vibrate(ms)}catch(e){}}
+
+// ================= 画面 =================
+let CUR='title';
+function show(id){CUR=id;if(id!=='result'&&!document.getElementById('assembly').classList.contains('on')){FX=[];fxx.clearRect(0,0,fxc.width,fxc.height)}document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('active',s.id==='s-'+id))}
+function progressCounts(){let parts=0,done=0;for(const k in dexData){const c=Object.keys(dexData[k].parts||{}).length;parts+=c;if(c===4)done++}return{parts,done}}
+function progressText(){const {parts,done}=progressCounts();return `集めたパーツ ${parts}/80 ・ 完成 ${done}/20体`}
+function toTitle(){document.getElementById('titleProgress').textContent=progressText();show('title')}
+function showHowto(){document.getElementById('howto').classList.add('on')}
+function hideHowto(){document.getElementById('howto').classList.remove('on');settings.seen=true;saveSet()}
+document.getElementById('btnStart').onclick=()=>{audioInit();sUI();toSelect();if(!settings.seen)setTimeout(showHowto,350)};
+
+// ================= タイトル背景(地層) =================
+const tbg=document.getElementById('titleBg');let tbgCache=null;const motes=[];
+function drawTitleBg(){
+  const dpr=Math.min(2,devicePixelRatio||1),W=Math.round(tbg.clientWidth*dpr),H=Math.round(tbg.clientHeight*dpr);
+  if(!W||!H)return;tbg.width=W;tbg.height=H;
+  const cv=document.createElement('canvas');cv.width=W;cv.height=H;const c=cv.getContext('2d');
+  const rng=mulberry32(12);
+  const cols=[[92,66,48],[120,86,58],[150,108,70],[110,80,58],[134,100,72],[96,72,56],[78,58,46],[104,78,60],[70,52,42],[58,44,36],[46,36,30]];
+  const tops=[];for(let k=0;k<cols.length;k++)tops.push(H*(-0.02+k*0.1));
+  const ph=cols.map(()=>[rng()*6,rng()*6,rng()*0.5+0.6]);
+  for(let k=0;k<cols.length;k++){
+    const [r,g,b]=cols[k];c.beginPath();c.moveTo(0,H);
+    for(let x=0;x<=W;x+=W/60){const y=tops[k]+Math.sin(x/W*6*ph[k][2]+ph[k][0])*H*0.012+Math.sin(x/W*17+ph[k][1])*H*0.005+x/W*H*0.04;c.lineTo(x,y)}
+    c.lineTo(W,H);c.closePath();
+    const gr=c.createLinearGradient(0,tops[k],0,tops[k]+H*0.12);gr.addColorStop(0,`rgb(${r+18},${g+14},${b+10})`);gr.addColorStop(1,`rgb(${r},${g},${b})`);
+    c.fillStyle=gr;c.fill();
+    c.strokeStyle='rgba(0,0,0,.25)';c.lineWidth=2*dpr;c.stroke();
+  }
+  // 粒・小石
+  for(let i=0;i<1400;i++){const x=rng()*W,y=rng()*H,s=(rng()*2.2+0.5)*dpr;c.fillStyle=rng()<0.5?`rgba(0,0,0,${0.08+rng()*0.15})`:`rgba(255,230,190,${0.04+rng()*0.08})`;c.fillRect(x,y,s,s)}
+  for(let i=0;i<70;i++){const x=rng()*W,y=rng()*H,rx=(3+rng()*9)*dpr,ry=rx*(0.6+rng()*0.3);
+    const g=c.createRadialGradient(x-rx*0.3,y-ry*0.4,1,x,y,rx);g.addColorStop(0,'rgba(200,180,155,.55)');g.addColorStop(1,'rgba(90,70,55,.5)');
+    c.fillStyle=g;c.beginPath();c.ellipse(x,y,rx,ry,rng()*3,0,7);c.fill()}
+  // 埋まった化石
+  const put=(sp,part,thick,cx,cy,size,rot,alpha)=>{const sh=makeShape(sp,part,thick);const fv=renderFossil(rasterDome(sh,256,0.04),256,0.04);
+    c.save();c.translate(cx,cy);c.rotate(rot);c.globalAlpha=alpha;c.shadowColor='rgba(0,0,0,.55)';c.shadowBlur=10*dpr;c.shadowOffsetY=4*dpr;c.drawImage(fv,-size/2,-size/2,size,size);c.restore()};
+  put(18,0,1,W*0.36,H*0.33,W*0.95,-0.18,0.92);
+  put(15,1,1,W*0.78,H*0.12,W*0.6,0.35,0.55);
+  put(3,3,1,W*0.12,H*0.06,W*0.45,0.6,0.45);
+  // アンモナイト
+  c.save();c.translate(W*0.86,H*0.42);c.globalAlpha=0.6;c.strokeStyle='#e8d6b0';c.lineWidth=3*dpr;c.beginPath();
+  for(let a=0;a<6*Math.PI;a+=0.1){const r=(2+a*3.2)*dpr;c.lineTo(Math.cos(a)*r,Math.sin(a)*r)}c.stroke();
+  for(let a=1;a<6*Math.PI;a+=0.45){const r=(2+a*3.2)*dpr;c.beginPath();c.moveTo(Math.cos(a)*r*0.75,Math.sin(a)*r*0.75);c.lineTo(Math.cos(a)*r,Math.sin(a)*r);c.lineWidth=1.5*dpr;c.stroke()}
+  c.restore();
+  // 光と影
+  let g=c.createRadialGradient(W*0.5,H*0.08,0,W*0.5,H*0.08,H*0.75);g.addColorStop(0,'rgba(255,200,120,.32)');g.addColorStop(1,'rgba(255,200,120,0)');c.fillStyle=g;c.fillRect(0,0,W,H);
+  g=c.createLinearGradient(0,H*0.45,0,H);g.addColorStop(0,'rgba(12,8,6,0)');g.addColorStop(1,'rgba(12,8,6,.92)');c.fillStyle=g;c.fillRect(0,0,W,H);
+  g=c.createRadialGradient(W/2,H*0.4,H*0.3,W/2,H*0.4,H*0.9);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(0,0,0,.55)');c.fillStyle=g;c.fillRect(0,0,W,H);
+  tbgCache=cv;
+  motes.length=0;for(let i=0;i<40;i++)motes.push({x:rnd()*W,y:rnd()*H,v:(5+rnd()*12)*dpr,s:(0.8+rnd()*1.8)*dpr,p:rnd()*6});
+}
+function drawTitle(t,dt){
+  if(!tbgCache)return;const c=tbg.getContext('2d'),W=tbg.width,H=tbg.height;c.drawImage(tbgCache,0,0);
+  for(const m of motes){m.y-=m.v*dt;m.x+=Math.sin(t*0.6+m.p)*0.3;if(m.y<-5){m.y=H+5;m.x=rnd()*W}
+    c.fillStyle=`rgba(255,225,170,${0.25+0.25*Math.sin(t*2+m.p)})`;c.beginPath();c.arc(m.x,m.y,m.s,0,7);c.fill()}
+}
+
+// ================= 岩選び =================
+function renderRockThumb(seed,size){
+  const rng=mulberry32(seed),cv=document.createElement('canvas');cv.width=cv.height=size;const c=cv.getContext('2d');
+  const n1=lattice(size,size,size/5,size/5,rng),n2=lattice(size,size,size/14,size/14,rng),n3=lattice(size,size,3,3,rng);
+  const ph=[rng()*6,rng()*6,rng()*6],R0=size*0.36,h=new Float32Array(size*size);
+  for(let y=0;y<size;y++)for(let x=0;x<size;x++){const dx=x-size/2,dy=(y-size*0.5)*1.18,a=Math.atan2(dy,dx);
+    const rr=R0*(1+0.09*Math.sin(3*a+ph[0])+0.06*Math.sin(5*a+ph[1])+0.04*Math.sin(9*a+ph[2])),d=Math.hypot(dx,dy)/rr;
+    if(d<1)h[y*size+x]=Math.sqrt(1-d*d)*size*0.22+(n1[y*size+x]-0.5)*size*0.05+(n2[y*size+x]-0.5)*size*0.02}
+  const im=c.createImageData(size,size),dd=im.data;
+  for(let y=1;y<size-1;y++)for(let x=1;x<size-1;x++){const p=y*size+x;if(h[p]<=0)continue;
+    const gx=(h[p+1]-h[p-1])+(n3[p+1]-n3[p-1])*1.2,gy=(h[p+size]-h[p-size])+(n3[p+size]-n3[p-size])*1.2;
+    const nx=-gx*0.5,ny=-gy*0.5,inv=1/Math.sqrt(nx*nx+ny*ny+1),dl=(nx*Lx+ny*Ly+Lz)*inv,lit=dl>0?dl:0,shade=0.32+0.85*lit;
+    const sm=Math.min(1,Math.max(0,(n1[p]-0.42)/0.16)),v=(n3[p]-0.5)*40;
+    const k=sm*0.55;let r=126+46*k+v,g=115+14*k+v*0.9,b=106-20*k+v*0.8;
+    const edge=Math.min(1,h[p]/(size*0.03));
+    dd[p*4]=r*shade;dd[p*4+1]=g*shade;dd[p*4+2]=b*shade;dd[p*4+3]=255*Math.min(1,edge*3);}
+  const t=document.createElement('canvas');t.width=t.height=size;const tc=t.getContext('2d');tc.putImageData(im,0,0);
+  c.fillStyle='rgba(0,0,0,.45)';c.filter='blur('+(size*0.04)+'px)';c.beginPath();c.ellipse(size*0.53,size*0.8,size*0.36,size*0.09,0,0,7);c.fill();c.filter='none';
+  c.drawImage(t,0,0);return cv;
+}
+let rockChoices=[],choosing=false;
+function pickRarity(){const r=rnd();return r<0.5?1:r<0.8?2:r<0.95?3:4}
+function toSelect(){
+  document.getElementById('progressText').textContent=progressText();
+  rockChoices=[0,1,2].map(()=>{const r=pickRarity();const pool=SPECIES.map((s,i)=>({...s,i})).filter(s=>s.r===r);
+    return {r,sp:pool[Math.floor(rnd()*pool.length)].i,part:Math.floor(rnd()*4),seed:Math.floor(rnd()*1e9)}});
+  const el=document.getElementById('rocks');el.innerHTML='';choosing=false;
+  rockChoices.forEach((rk,idx)=>{
+    const s=document.createElement('div');s.className='rock-slot';
+    const box=document.createElement('div');box.className='rk r'+rk.r;box.appendChild(renderRockThumb(rk.seed,220));
+    const ns=rk.r===1?0:rk.r===2?3:rk.r===3?6:10;
+    for(let k=0;k<ns;k++){const sp=document.createElement('i');sp.className='spark';sp.style.left=(10+rnd()*75)+'%';sp.style.top=(10+rnd()*65)+'%';sp.style.animationDelay=(rnd()*1.6)+'s';const sz=5+rnd()*7;sp.style.width=sp.style.height=sz+'px';box.appendChild(sp)}
+    s.appendChild(box);const tg=document.createElement('div');tg.className='tag';tg.innerHTML=RAR[rk.r].hint;s.appendChild(tg);
+    s.onclick=()=>{if(choosing)return;choosing=true;audioInit();sSelect();buzz(15);
+      el.querySelectorAll('.rock-slot').forEach((o,j)=>o.classList.add(j===idx?'chosen':'fade'));
+      setTimeout(()=>startClean(rockChoices[idx]),480)};
+    el.appendChild(s);
+  });
+  show('select');
+}
+
+// ================= ディスプレイ用の固定テクスチャ =================
+const BI0=new Int32Array(D),BI1=new Int32Array(D),BF=new Float32Array(D);
+for(let x=0;x<D;x++){let u=(x+0.5)/4-0.5;if(u<0)u=0;if(u>SIM-1)u=SIM-1;const i=Math.floor(u);BI0[x]=i;BI1[x]=Math.min(SIM-1,i+1);BF[x]=u-i}
+const TX=(()=>{
+  const a=lattice(D,D,6,6),b=lattice(D,D,3,3),c=lattice(D,D,1.5,1.5),str=lattice(D,D,48,5),str2=lattice(D,D,20,2.5);
+  const DN=new Float32Array(ND),DNX=new Float32Array(ND),DNY=new Float32Array(ND),STR=new Float32Array(ND),SPK=new Float32Array(ND),SP=new Uint8Array(ND),JX=new Int8Array(ND),JY=new Int8Array(ND);
+  for(let i=0;i<ND;i++){DN[i]=0.5*a[i]+0.32*b[i]+0.18*c[i]-0.5;STR[i]=(str[i]-0.5)*1.4+(str2[i]-0.5)*0.8;SPK[i]=Math.random()*2-1;SP[i]=Math.random()<0.025?1:0}
+  const jx=lattice(D,D,5,5),jy=lattice(D,D,5,5);
+  for(let y=0;y<D;y++)for(let x=0;x<D;x++){const p=y*D+x;
+    DNX[p]=x>0&&x<D-1?(DN[p+1]-DN[p-1]):0;DNY[p]=y>0&&y<D-1?(DN[p+D]-DN[p-D]):0;
+    JX[p]=Math.round((jx[p]-0.5)*6);JY[p]=Math.round((jy[p]-0.5)*6)}
+  return {DN,DNX,DNY,STR,SPK,SP,JX,JY};
+})();
+const COV=new Float32Array(ND),SURF=new Float32Array(ND);
+
+// ================= クリーニング本体 =================
+const board=document.getElementById('board'),ctx=board.getContext('2d');
+const off=document.createElement('canvas');off.width=off.height=D;const octx=off.getContext('2d');const img=octx.createImageData(D,D);
+const tmp=document.createElement('canvas');tmp.width=tmp.height=D;const tctx=tmp.getContext('2d');
+let G=null;
+
+function startClean(rock){
+  const R=RAR[rock.r];const shape=makeShape(rock.sp,rock.part,R.thick);
+  const domeHi=rasterDome(shape,D,FMARGIN);
+  const soil=new Float32Array(NS),rockL=new Float32Array(NS),hard=new Float32Array(NS),cov=new Float32Array(NS),cellDmg=new Float32Array(NS),
+        fossil=new Uint8Array(NS),inRock=new Uint8Array(NS),jit=new Float32Array(NS),hardInit=new Float32Array(NS);
+  const fossilIdx=[];
+  for(let sy=0;sy<SIM;sy++)for(let sx=0;sx<SIM;sx++){const i=sy*SIM+sx;const dm=domeHi[(sy*4+2)*D+sx*4+2];if(dm>0){fossil[i]=1;fossilIdx.push(i)}jit[i]=rnd()*2-1}
+  // 岩の輪郭(不定形、化石は必ず中に入る)
+  const BINS=90,cxy=SIM/2,maxd=new Float32Array(BINS),ph=[rnd()*6,rnd()*6,rnd()*6];
+  for(const i of fossilIdx){const dx=i%SIM+0.5-cxy,dy=(i/SIM|0)+0.5-cxy,b=Math.floor((Math.atan2(dy,dx)+Math.PI)/(2*Math.PI)*BINS)%BINS;maxd[b]=Math.max(maxd[b],Math.hypot(dx,dy))}
+  let br=new Float32Array(BINS);
+  for(let b=0;b<BINS;b++){const a=b/BINS*2*Math.PI-Math.PI;br[b]=Math.max(SIM*0.44*(1+0.07*Math.sin(3*a+ph[0])+0.05*Math.sin(5*a+ph[1])+0.03*Math.sin(9*a+ph[2])),maxd[b]+4)}
+  for(let k=0;k<3;k++){const nb=new Float32Array(BINS);for(let b=0;b<BINS;b++)nb[b]=(br[(b+BINS-1)%BINS]+2*br[b]+br[(b+1)%BINS])/4;br=nb}
+  for(let b=0;b<BINS;b++)br[b]=Math.min(SIM*0.495,Math.max(br[b],maxd[b]+3));
+  const n1=lattice(SIM,SIM,SIM/5,SIM/5),n2=lattice(SIM,SIM,SIM/4,SIM/4);
+  for(let sy=0;sy<SIM;sy++)for(let sx=0;sx<SIM;sx++){const i=sy*SIM+sx,dx=sx+0.5-cxy,dy=sy+0.5-cxy;
+    const fb=(Math.atan2(dy,dx)+Math.PI)/(2*Math.PI)*BINS,b0=Math.floor(fb)%BINS,b1=(b0+1)%BINS,t=fb-Math.floor(fb),rad=br[b0]*(1-t)+br[b1]*t;
+    const rr=Math.hypot(dx,dy)/rad;if(rr>=1)continue;inRock[i]=1;
+    const dome=Math.sqrt(Math.max(0,1-rr*rr)),edge=Math.min(1,(1-rr)/0.14),e2=edge*edge*(3-2*edge);
+    soil[i]=(0.45+n1[i]*0.55)*Math.min(1,dome*2.2)*e2;
+    rockL[i]=Math.max(0.06,(0.25+2.1*dome+(n2[i]-0.5)*0.8)*e2);
+    if(fossil[i]){const dm=domeHi[(sy*4+2)*D+sx*4+2];rockL[i]=Math.max(0.25,rockL[i]-dm*0.9)}
+  }
+  // 硬い岩(化石の近く)
+  for(let k=0;k<R.hard;k++){const base=fossilIdx[Math.floor(rnd()*fossilIdx.length)];
+    const cx=base%SIM+(rnd()*10-5),cy=Math.floor(base/SIM)+(rnd()*10-5),rad=5+rnd()*5;
+    for(let y=Math.max(0,Math.floor(cy-rad));y<Math.min(SIM,cy+rad+1);y++)for(let x=Math.max(0,Math.floor(cx-rad));x<Math.min(SIM,cx+rad+1);x++){
+      const i=y*SIM+x;if(!inRock[i])continue;if(Math.hypot(x-cx,y-cy)+jit[i]*1.2<rad){hard[i]=3;hardInit[i]=3}}}
+  for(let i=0;i<NS;i++)cov[i]=soil[i]+rockL[i]+hard[i];
+  // 割れる塊(ボロノイ)
+  const seeds=[];const SP4=4;
+  for(let y=0;y<SIM;y+=SP4)for(let x=0;x<SIM;x+=SP4)seeds.push([x+rnd()*SP4,y+rnd()*SP4]);
+  const gw=Math.ceil(SIM/SP4),chunk=new Int32Array(NS);
+  for(let y=0;y<SIM;y++)for(let x=0;x<SIM;x++){const gx=Math.floor(x/SP4),gy=Math.floor(y/SP4);let best=1e9,bi=0;
+    for(let oy=-1;oy<=1;oy++)for(let ox=-1;ox<=1;ox++){const qx=gx+ox,qy=gy+oy;if(qx<0||qy<0||qx>=gw||qy>=gw)continue;const si=qy*gw+qx,s=seeds[si];
+      const d=(s[0]-x-0.5)**2+(s[1]-y-0.5)**2+jit[y*SIM+x]*0.8;if(d<best){best=d;bi=si}}chunk[y*SIM+x]=bi}
+  const cnt=new Int32Array(seeds.length);for(let i=0;i<NS;i++)cnt[chunk[i]]++;
+  const cStart=new Int32Array(seeds.length+1);for(let k=0;k<seeds.length;k++)cStart[k+1]=cStart[k]+cnt[k];
+  const fill=cStart.slice(0,seeds.length),cList=new Int32Array(NS);for(let i=0;i<NS;i++)cList[fill[chunk[i]]++]=i;
+  // 小石(岩の層の凹凸)
+  const PEB=new Float32Array(ND),PBX=new Float32Array(ND),PBY=new Float32Array(ND);
+  for(let k=0;k<260;k++){const px=rnd()*D,py=rnd()*D,r=2+rnd()*4.5;
+    for(let y=Math.max(0,Math.floor(py-r));y<Math.min(D,py+r+1);y++)for(let x=Math.max(0,Math.floor(px-r));x<Math.min(D,px+r+1);x++){
+      const d=Math.hypot(x-px,y-py)/r;if(d<1)PEB[y*D+x]=Math.max(PEB[y*D+x],Math.sqrt(1-d*d)*0.5)}}
+  for(let y=1;y<D-1;y++)for(let x=1;x<D-1;x++){const p=y*D+x;PBX[p]=PEB[p+1]-PEB[p-1];PBY[p]=PEB[p+D]-PEB[p-D]}
+  // ヒビ
+  const cracks=[];
+  for(let k=0;k<6;k++){const st=fossilIdx[Math.floor(rnd()*fossilIdx.length)];let x=(st%SIM)*4+2,y=Math.floor(st/SIM)*4+2,a=rnd()*Math.PI*2;const pts=[[x,y]];
+    for(let j=0;j<8;j++){a+=rnd()*1.2-0.6;x+=Math.cos(a)*9;y+=Math.sin(a)*9;pts.push([x,y])}cracks.push(pts)}
+  // 化石マスク(光の演出用)
+  const mk=document.createElement('canvas');mk.width=mk.height=D;const mc=mk.getContext('2d'),mi=mc.createImageData(D,D);
+  for(let p=0;p<ND;p++)if(domeHi[p]>0){mi.data[p*4]=mi.data[p*4+1]=mi.data[p*4+2]=255;mi.data[p*4+3]=255}mc.putImageData(mi,0,0);
+  G={rock,R,shape,domeHi,soil,rockL,hard,hardInit,cov,cellDmg,fossil,fossilIdx,fossilCount:fossilIdx.length,inRock,jit,chunk,cStart,cList,seeds,
+     PEB,PBX,PBY,cracks,mask:mk,totalDmg:0,time:R.time,tool:G?G.tool:'hammer',down:false,px:-99,py:-99,over:false,seq:null,seqT:0,
+     parts:[],flashes:[],trauma:0,freeze:0,lastHammer:0,hudT:0,exp:0,ms:0,revealed:false,dirty:null,lastSec:99,crackT:0,dark:0,sweep:-1};
+  document.querySelectorAll('.tool').forEach(b=>b.classList.toggle('sel',b.dataset.tool===G.tool));
+  document.querySelectorAll('#expGauge i').forEach(i=>i.classList.remove('on'));
+  document.getElementById('floatLayer').innerHTML='';
+  show('clean');resizeBoard();renderRect(0,0,D,D);updateHud();
+  const bw=document.getElementById('boardWrap');bw.classList.remove('intro');void bw.offsetWidth;bw.classList.add('intro');
+}
+function resizeBoard(){const dpr=Math.min(devicePixelRatio||1,2);board.width=board.height=Math.round(board.clientWidth*dpr)}
+window.addEventListener('resize',()=>{if(CUR==='clean')resizeBoard();if(CUR==='title')drawTitleBg()});
+
+// ---- 描画:高さ+光+落ち影 ----
+const ROUGH=[0.9,1.15,0.55,0.22,0.25],K=5,SHX=4,SHY=5;
+function renderRect(x0,y0,x1,y1){
+  x0=Math.max(1,x0|0);y0=Math.max(1,y0|0);x1=Math.min(D-1,Math.ceil(x1));y1=Math.min(D-1,Math.ceil(y1));if(x1<=x0||y1<=y0)return;
+  const ax0=Math.max(0,x0-SHX-2),ay0=Math.max(0,y0-SHY-2),ax1=Math.min(D,x1+2),ay1=Math.min(D,y1+2);
+  const cov=G.cov,dome=G.domeHi;
+  for(let y=ay0;y<ay1;y++){const r0=BI0[y]*SIM,r1=BI1[y]*SIM,fy=BF[y];
+    for(let x=ax0;x<ax1;x++){const i0=BI0[x],i1=BI1[x],fx=BF[x];
+      const c=(cov[r0+i0]+(cov[r0+i1]-cov[r0+i0])*fx)*(1-fy)+(cov[r1+i0]+(cov[r1+i1]-cov[r1+i0])*fx)*fy;
+      const p=y*D+x;COV[p]=c;SURF[p]=c+dome[p]}}
+  const d=img.data,{DN,DNX,DNY,STR,SPK,SP,JX,JY}=TX,PEB=G.PEB,PBX=G.PBX,PBY=G.PBY,soil=G.soil,rockL=G.rockL,hard=G.hard,dmg=G.cellDmg;
+  for(let y=y0;y<y1;y++){
+    const r0=BI0[y]*SIM,r1=BI1[y]*SIM,fy=BF[y];
+    for(let x=x0;x<x1;x++){
+      const p=y*D+x,c=COV[p],DNp=TX.DN[p];
+      let gx=SURF[p+1]-SURF[p-1],gy=SURF[p+D]-SURF[p-D];
+      let mat;
+      if(c>0.05+DNp*0.12){let sx=(x+JX[p])>>2,sy=(y+JY[p])>>2;sx=sx<0?0:sx>=SIM?SIM-1:sx;sy=sy<0?0:sy>=SIM?SIM-1:sy;const j=sy*SIM+sx;
+        mat=soil[j]>0.001?0:rockL[j]>0.001?1:hard[j]>0.001?2:1}
+      else mat=dome[p]>0?3:4;
+      const ro=ROUGH[mat];gx+=DNX[p]*ro;gy+=DNY[p]*ro;
+      if(mat===1){gx+=PBX[p];gy+=PBY[p]}
+      const nx=-gx*K,ny=-gy*K,inv=1/Math.sqrt(nx*nx+ny*ny+1),dl=(nx*Lx+ny*Ly+Lz)*inv,lit=dl>0?dl:0;
+      let shade=0.38+0.8*lit;
+      if(y>=SHY&&x>=SHX){let sh=(SURF[p-SHY*D-SHX]-SURF[p]-0.12)*0.65;if(sh>0){if(sh>0.6)sh=0.6;shade*=1-sh}}
+      const dn=DN[p];let r,g,b;
+      if(mat===0){const v=dn*75+SPK[p]*13;r=174+v;g=129+v*0.85;b=86+v*0.6}
+      else if(mat===1){const st=STR[p]*18,pe=PEB[p]*36;r=124+st+pe+dn*32;g=113+st+pe+dn*30;b=104+st*0.9+pe+dn*28}
+      else if(mat===2){r=64+dn*34;g=68+dn*34;b=86+dn*38;if(SP[p]){const gl=Math.pow(lit,5)*230;r+=gl;g+=gl;b+=gl*1.1}}
+      else if(mat===3){r=238+dn*20;g=226+dn*20;b=198+dn*18}
+      else{const w=((x+y)&3)===0?-5:0;r=40+dn*16+w;g=45+dn*16+w;b=47+dn*16+w}
+      r*=shade;g*=shade;b*=shade;
+      if(mat===3){const sp=Math.pow(lit,14)*120;r+=sp;g+=sp;b+=sp;
+        const i0=BI0[x],i1=BI1[x],fx=BF[x];const t0=(dmg[r0+i0]+(dmg[r0+i1]-dmg[r0+i0])*fx)*(1-fy)+(dmg[r1+i0]+(dmg[r1+i1]-dmg[r1+i0])*fx)*fy;
+        if(t0>0.004){const t=t0>=0.45?1:t0/0.45;[r,g,b]=tint(r,g,b,t,shade)}}
+      else if(mat<3&&c<0.55&&dome[p]>0){const t=(1-c/0.55)*0.5;r+=(225*shade-r)*t;g+=(214*shade-g)*t;b+=(188*shade-b)*t}
+      const o=p*4;d[o]=r;d[o+1]=g;d[o+2]=b;d[o+3]=255;
+    }}
+  octx.putImageData(img,0,0,x0,y0,x1-x0,y1-y0);
+}
+function markDirty(sx0,sy0,sx1,sy1){const x0=sx0*4-10,y0=sy0*4-10,x1=sx1*4+14,y1=sy1*4+14;
+  if(!G.dirty)G.dirty=[x0,y0,x1,y1];else{const q=G.dirty;q[0]=Math.min(q[0],x0);q[1]=Math.min(q[1],y0);q[2]=Math.max(q[2],x1);q[3]=Math.max(q[3],y1)}}
+
+// ---- 道具 ----
+const OP={soil:0,rock:0,hard:0,dmg:0,total:0};
+function resetOP(){OP.soil=OP.rock=OP.hard=OP.dmg=OP.total=0}
+function applyPower(i,p,isDrill,dmgF){
+  let rem=p;
+  if(G.soil[i]>0){const d=Math.min(G.soil[i],rem);G.soil[i]-=d;rem-=d;OP.soil+=d}
+  if(rem>0&&G.rockL[i]>0){const d=Math.min(G.rockL[i],rem);G.rockL[i]-=d;rem-=d;OP.rock+=d}
+  if(rem>0&&G.hard[i]>0){const eff=isDrill?0.25:1,d=Math.min(G.hard[i],rem*eff);G.hard[i]-=d;rem-=d/eff;OP.hard+=d}
+  if(rem>1e-6&&G.fossil[i]){const dm=rem*dmgF;G.cellDmg[i]+=dm;G.totalDmg+=dm;OP.dmg+=dm}
+  const nc=G.soil[i]+G.rockL[i]+G.hard[i];OP.total+=G.cov[i]-nc;G.cov[i]=nc<1e-5?0:nc;
+}
+function hammerAt(gx,gy){
+  const t=TOOLS.hammer,r=t.r;resetOP();const ids=new Set();
+  const X0=Math.max(0,Math.floor(gx-r-3)),X1=Math.min(SIM-1,Math.ceil(gx+r+3)),Y0=Math.max(0,Math.floor(gy-r-3)),Y1=Math.min(SIM-1,Math.ceil(gy+r+3));
+  for(let y=Y0;y<=Y1;y++)for(let x=X0;x<=X1;x++)if(Math.hypot(x+0.5-gx,y+0.5-gy)<r+1)ids.add(G.chunk[y*SIM+x]);
+  let bx0=SIM,by0=SIM,bx1=0,by1=0;
+  for(const id of ids){const s=G.seeds[id],dd=Math.hypot(s[0]-gx,s[1]-gy);if(dd>r)continue;const pw=t.pow*(1-0.6*(dd/r)*(dd/r));
+    for(let k=G.cStart[id];k<G.cStart[id+1];k++){const i=G.cList[k];if(!G.inRock[i])continue;applyPower(i,pw,false,t.dmg);const x=i%SIM,y=i/SIM|0;
+      if(x<bx0)bx0=x;if(x>bx1)bx1=x;if(y<by0)by0=y;if(y>by1)by1=y}}
+  if(bx1>=bx0)markDirty(bx0,by0,bx1+1,by1+1);
+  const X=gx*4,Y=gy*4;
+  if(OP.total>0.01||OP.dmg>0){
+    const isHard=OP.hard>2.5;
+    if(isHard){sHard();G.freeze=0.06;addTrauma(0.5);addFlash(X,Y,70,'255,255,255',0.12);spawnShards(X,Y,'hard',22,1.4);buzz(25)}
+    else{sHammer();G.freeze=0.035;addTrauma(0.32);addFlash(X,Y,50,'255,240,215',0.09);buzz(12)}
+    const tot=OP.soil+OP.rock+OP.hard||1;
+    spawnShards(X,Y,'soil',Math.round(14*OP.soil/tot),1);spawnShards(X,Y,'rock',Math.round(14*OP.rock/tot),1.1);if(!isHard)spawnShards(X,Y,'hard',Math.round(10*OP.hard/tot),1.2);
+    spawnDust(X,Y,OP.soil>OP.rock?'soil':'rock',6);
+  }else{nz({f:900,f2:300,dur:0.08,g:0.25})}
+  if(OP.dmg>0.4)fossilHitFx(X,Y,OP.dmg);
+}
+function drillAt(gx,gy,dt){
+  const t=TOOLS[G.tool],r=t.r;resetOP();
+  const X0=Math.max(0,Math.floor(gx-r-1)),X1=Math.min(SIM-1,Math.ceil(gx+r+1)),Y0=Math.max(0,Math.floor(gy-r-1)),Y1=Math.min(SIM-1,Math.ceil(gy+r+1));
+  for(let y=Y0;y<=Y1;y++)for(let x=X0;x<=X1;x++){const i=y*SIM+x;if(!G.inRock[i])continue;const d=Math.hypot(x+0.5-gx,y+0.5-gy)+G.jit[i]*0.6;if(d>r)continue;
+    applyPower(i,t.rate*dt*(1-0.5*(d/r)*(d/r)),true,t.dmg)}
+  markDirty(X0,Y0,X1+1,Y1+1);
+  const X=gx*4,Y=gy*4;
+  if(OP.total>0.002){const m=OP.hard>OP.rock&&OP.hard>OP.soil?'hard':OP.rock>OP.soil?'rock':'soil';
+    if(rnd()<({d1:0.35,d2:0.6,d3:0.9})[G.tool])spawnGrit(X,Y,m,G.tool==='d3'?3:1);
+    if(G.tool==='d3'&&rnd()<0.15)spawnDust(X,Y,m,1);
+    if(G.tool==='d3')addTrauma(0.03)}
+  if(OP.dmg>0.0005){if(rnd()<0.5)spawnSpark(X,Y,2);if(OP.dmg>0.02&&rnd()<0.3)document.getElementById('gauge').classList.add('hit')}
+  drillLevel(OP.total/dt,OP.dmg/dt*0.05);
+}
+
+// ---- 演出パーツ ----
+const MC={soil:[[184,138,92],[150,108,70],[205,165,115]],rock:[[130,118,108],[100,90,82],[160,148,135]],hard:[[70,74,92],[52,55,70],[110,115,135]],fossil:[[238,226,198],[210,195,165],[200,130,235]]};
+function shardPoly(){const n=4+(rnd()*3|0),pts=[];for(let k=0;k<n;k++){const a=k/n*Math.PI*2+rnd()*0.6,r=0.6+rnd()*0.5;pts.push([Math.cos(a)*r,Math.sin(a)*r])}return pts}
+function spawnShards(x,y,m,n,big){for(let k=0;k<n;k++){const a=rnd()*Math.PI*2,sp=(60+rnd()*180)*big;const c=MC[m][rnd()*3|0];
+  G.parts.push({k:'sh',x:x+(rnd()-0.5)*14,y:y+(rnd()-0.5)*14,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-120*big,rot:rnd()*6,vr:(rnd()-0.5)*14,s:(2.5+rnd()*4.5)*big,life:0.7+rnd()*0.4,max:1.1,c,poly:shardPoly()})}}
+function spawnGrit(x,y,m,n){for(let k=0;k<n;k++){const a=rnd()*Math.PI*2,sp=40+rnd()*120,c=MC[m][rnd()*3|0];
+  G.parts.push({k:'gr',x:x+(rnd()-0.5)*8,y:y+(rnd()-0.5)*8,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-50,s:1+rnd()*1.8,life:0.35+rnd()*0.3,max:0.65,c})}}
+function spawnDust(x,y,m,n){for(let k=0;k<n;k++){const c=MC[m][2];G.parts.push({k:'du',x:x+(rnd()-0.5)*20,y:y+(rnd()-0.5)*20,vx:(rnd()-0.5)*40,vy:-10-rnd()*25,s:6+rnd()*6,g:18+rnd()*14,life:0.6+rnd()*0.5,max:1.1,c})}}
+function spawnSpark(x,y,n,col){for(let k=0;k<n;k++){const a=rnd()*Math.PI*2,sp=150+rnd()*260;G.parts.push({k:'sp',x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:0.18+rnd()*0.2,max:0.4,c:col||(rnd()<0.6?[205,140,255]:[255,240,255])})}}
+function spawnTwinkle(x,y,n,spread){for(let k=0;k<n;k++)G.parts.push({k:'tw',x:x+(rnd()-0.5)*spread,y:y+(rnd()-0.5)*spread,vx:0,vy:-12,s:4+rnd()*6,life:0.5+rnd()*0.6,max:1.1,ph:rnd()*6})}
+function addFlash(x,y,r,col,life){G.flashes.push({x,y,r,col,life,max:life})}
+function addTrauma(v){G.trauma=Math.min(1,G.trauma+v)}
+function fossilHitFx(x,y,amt){sFossil();addFlash(x,y,60,'190,110,255',0.18);spawnSpark(x,y,10+Math.min(14,amt*6));addTrauma(0.25);G.freeze=Math.max(G.freeze,0.05);
+  const g=document.getElementById('gauge');g.classList.remove('hit');void g.offsetWidth;g.classList.add('hit');floatText(x,y-30,'ガキッ!','purple');buzz([20,30,20])}
+function floatText(x,y,txt,cls){const el=document.createElement('div');el.className='ftxt'+(cls?' '+cls:'');el.textContent=txt;el.style.left=(x/D*100)+'%';el.style.top=(y/D*100)+'%';
+  document.getElementById('floatLayer').appendChild(el);setTimeout(()=>el.remove(),1200)}
+
+// ---- 入力 ----
+document.querySelectorAll('.tool').forEach(b=>b.onclick=()=>{if(!G)return;G.tool=b.dataset.tool;sUI();
+  document.querySelectorAll('.tool').forEach(x=>x.classList.toggle('sel',x===b));if(G.down&&G.tool!=='hammer')drillOn(G.tool);else drillOff()});
+function toGrid(ev){const r=board.getBoundingClientRect();return[(ev.clientX-r.left)/r.width*SIM,(ev.clientY-r.top)/r.height*SIM]}
+board.addEventListener('pointerdown',ev=>{if(!G||G.over)return;ev.preventDefault();try{board.setPointerCapture(ev.pointerId)}catch(e){}
+  [G.px,G.py]=toGrid(ev);G.down=true;
+  if(G.tool==='hammer'){const now=performance.now();if(now-G.lastHammer>110){G.lastHammer=now;hammerAt(G.px,G.py)}}else drillOn(G.tool)});
+board.addEventListener('pointermove',ev=>{if(!G)return;[G.px,G.py]=toGrid(ev)});
+const up=()=>{if(G){G.down=false;drillOff()}};
+board.addEventListener('pointerup',up);board.addEventListener('pointercancel',up);
+board.addEventListener('pointerleave',ev=>{if(G&&ev.pointerType==='mouse'){G.down=false;G.px=-99;drillOff()}});
+
+// ---- HUD ----
+function exposure(){let e=0;for(const i of G.fossilIdx)if(G.cov[i]<=0.001)e++;return G.fossilCount?e/G.fossilCount:0}
+function updateHud(){
+  const t=Math.max(0,G.time),te=document.getElementById('time');te.textContent=t<10?t.toFixed(1):Math.ceil(t);
+  document.getElementById('timer').classList.toggle('low',t<10&&!G.over);
+  const durR=Math.max(0,1-G.totalDmg/G.R.dur);document.getElementById('gaugeBar').style.width=(durR*100)+'%';
+  document.getElementById('durTxt').textContent=Math.ceil(durR*100);
+  document.getElementById('gauge').classList.toggle('danger',durR<0.3);
+  G.exp=exposure();document.getElementById('expBar').style.width=(G.exp*100)+'%';document.getElementById('expTxt').textContent=Math.floor(G.exp*100)+'%';
+}
+function checkMilestones(){
+  if(!G.revealed&&G.exp>0){G.revealed=true;sReveal();let best=null;for(const i of G.fossilIdx)if(G.cov[i]<=0.001){best=i;break}
+    if(best!==null){const x=(best%SIM)*4+2,y=Math.floor(best/SIM)*4+2;spawnTwinkle(x,y,8,30);addFlash(x,y,40,'255,240,200',0.3);floatText(x,y-28,'化石が見えた!')}}
+  const th=[0.25,0.5,0.75];
+  while(G.ms<3&&G.exp>=th[G.ms]){sDing(G.ms);document.querySelectorAll('#expGauge i')[G.ms].classList.add('on');floatText(D/2,D*0.88,Math.round(th[G.ms]*100)+'%!');G.ms++}
+}
+
+// ---- 盤面描画 ----
+function drawBoard(dt){
+  if(G.dirty){const q=G.dirty;renderRect(q[0],q[1],q[2],q[3]);G.dirty=null}
+  const W=board.width,s=W/D;
+  ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,W,W);
+  const sh=G.trauma*G.trauma*14*s;ctx.translate((rnd()-0.5)*sh,(rnd()-0.5)*sh);
+  ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';ctx.drawImage(off,0,0,W,W);
+  // ヒビ
+  const durR=1-G.totalDmg/G.R.dur;
+  if(durR<0.3||G.crackT>0){const k=G.crackT>0?1:Math.min(1,(0.3-durR)/0.3*1.3),grow=G.crackT>0?Math.min(1,G.crackT/0.35):k;
+    ctx.lineCap='round';ctx.lineJoin='round';
+    for(const pts of G.cracks){const n=Math.max(2,Math.round(pts.length*grow));ctx.beginPath();for(let j=0;j<n;j++){const[x,y]=pts[j];j?ctx.lineTo(x*s,y*s):ctx.moveTo(x*s,y*s)}
+      ctx.strokeStyle=`rgba(255,220,255,${0.25*k})`;ctx.lineWidth=3.2*s;ctx.stroke();ctx.strokeStyle=`rgba(45,0,70,${0.9*k})`;ctx.lineWidth=1.6*s;ctx.stroke()}}
+  // 光の帯(発掘完了)
+  if(G.sweep>=0){const pos=G.sweep;tctx.clearRect(0,0,D,D);tctx.globalCompositeOperation='source-over';
+    const gr=tctx.createLinearGradient(pos*D*1.6-D*0.6-80,0,pos*D*1.6-D*0.6+80,D*0.6);gr.addColorStop(0,'rgba(255,240,200,0)');gr.addColorStop(0.5,'rgba(255,245,215,.85)');gr.addColorStop(1,'rgba(255,240,200,0)');
+    tctx.fillStyle=gr;tctx.fillRect(0,0,D,D);tctx.globalCompositeOperation='destination-in';tctx.drawImage(G.mask,0,0);
+    ctx.globalCompositeOperation='lighter';ctx.drawImage(tmp,0,0,W,W);ctx.globalCompositeOperation='source-over'}
+  // 暗転
+  if(G.dark>0){ctx.fillStyle=`rgba(20,0,30,${G.dark})`;ctx.fillRect(-20,-20,W+40,W+40)}
+  // フラッシュ
+  ctx.globalCompositeOperation='lighter';
+  for(const f of G.flashes){const a=f.life/f.max,g=ctx.createRadialGradient(f.x*s,f.y*s,0,f.x*s,f.y*s,f.r*s*(1.4-a*0.4));g.addColorStop(0,`rgba(${f.col},${0.7*a})`);g.addColorStop(1,`rgba(${f.col},0)`);
+    ctx.fillStyle=g;ctx.fillRect(f.x*s-f.r*s*1.5,f.y*s-f.r*s*1.5,f.r*s*3,f.r*s*3)}
+  ctx.globalCompositeOperation='source-over';
+  // 粒子
+  for(const p of G.parts){const a=Math.min(1,p.life/(p.max*0.5));
+    if(p.k==='sh'){ctx.save();ctx.translate(p.x*s,p.y*s);ctx.rotate(p.rot);const z=p.s*s;ctx.globalAlpha=a;
+      ctx.beginPath();p.poly.forEach(([u,v],j)=>j?ctx.lineTo(u*z,v*z):ctx.moveTo(u*z,v*z));ctx.closePath();
+      ctx.fillStyle=`rgb(${p.c[0]},${p.c[1]},${p.c[2]})`;ctx.fill();ctx.strokeStyle='rgba(0,0,0,.35)';ctx.lineWidth=0.8*s;ctx.stroke();
+      ctx.beginPath();ctx.moveTo(p.poly[0][0]*z,p.poly[0][1]*z);ctx.lineTo(p.poly[1][0]*z,p.poly[1][1]*z);ctx.strokeStyle='rgba(255,255,255,.35)';ctx.stroke();ctx.restore()}
+    else if(p.k==='gr'){ctx.globalAlpha=a;ctx.fillStyle=`rgb(${p.c[0]},${p.c[1]},${p.c[2]})`;ctx.fillRect(p.x*s,p.y*s,p.s*s,p.s*s)}
+    else if(p.k==='du'){ctx.globalAlpha=0.32*a;ctx.fillStyle=`rgb(${p.c[0]},${p.c[1]},${p.c[2]})`;ctx.beginPath();ctx.arc(p.x*s,p.y*s,p.s*s,0,7);ctx.fill()}
+    else if(p.k==='sp'){ctx.globalAlpha=a;ctx.strokeStyle=`rgb(${p.c[0]},${p.c[1]},${p.c[2]})`;ctx.lineWidth=1.6*s;ctx.beginPath();ctx.moveTo(p.x*s,p.y*s);ctx.lineTo((p.x-p.vx*0.035)*s,(p.y-p.vy*0.035)*s);ctx.stroke()}
+    else if(p.k==='tw'){const tw=Math.max(0,Math.sin((p.max-p.life)*9+p.ph));ctx.globalAlpha=a*tw;ctx.fillStyle='#fff8e0';const z=p.s*s*(0.5+tw*0.5);
+      ctx.beginPath();ctx.moveTo(p.x*s,p.y*s-z);ctx.quadraticCurveTo(p.x*s,p.y*s,p.x*s+z,p.y*s);ctx.quadraticCurveTo(p.x*s,p.y*s,p.x*s,p.y*s+z);ctx.quadraticCurveTo(p.x*s,p.y*s,p.x*s-z,p.y*s);ctx.quadraticCurveTo(p.x*s,p.y*s,p.x*s,p.y*s-z);ctx.fill()}}
+  ctx.globalAlpha=1;
+  // 道具の範囲
+  if(!G.over&&G.px>=0&&G.px<=SIM&&G.py>=0&&G.py<=SIM){const r=TOOLS[G.tool].r*4*s;
+    ctx.strokeStyle=G.tool==='hammer'?'rgba(255,214,130,.85)':'rgba(255,255,255,.75)';ctx.lineWidth=2;ctx.setLineDash(G.tool==='hammer'?[]:[5,4]);
+    ctx.beginPath();ctx.arc(G.px*4*s,G.py*4*s,r,0,Math.PI*2);ctx.stroke();ctx.setLineDash([])}
+}
+function updateParts(dt){
+  for(const p of G.parts){p.life-=dt;p.x+=p.vx*dt;p.y+=p.vy*dt;
+    if(p.k==='sh'){p.vy+=700*dt;p.rot+=p.vr*dt}else if(p.k==='gr'){p.vy+=500*dt}else if(p.k==='du'){p.s+=p.g*dt;p.vx*=0.96}else if(p.k==='sp'){p.vx*=0.9;p.vy*=0.9}}
+  G.parts=G.parts.filter(p=>p.life>0);if(G.parts.length>500)G.parts.splice(0,G.parts.length-500);
+  for(const f of G.flashes)f.life-=dt;G.flashes=G.flashes.filter(f=>f.life>0);
+}
+
+// ---- 終了演出 ----
+function finish(reason){
+  if(!G||G.over)return;G.over=true;G.down=false;drillOff();updateHud();G.reason=reason;G.seqT=0;
+  if(reason==='clear'){G.seq='clear';sClear()}
+  else if(reason==='broken'){G.seq='break';sBreak();G.freeze=0.12;addTrauma(1);buzz([60,40,120])}
+  else{G.seq='end';if(reason==='time'){sTimeUp();floatText(D/2,D/2,'タイムアップ!')}}
+}
+function runSeq(dt){
+  G.seqT+=dt;const t=G.seqT;
+  if(G.seq==='clear'){
+    if(t<0.7){const rad=t/0.7*SIM*0.75;let any=false;
+      for(let i=0;i<NS;i++){if(G.cov[i]<=0||!G.inRock[i])continue;const x=i%SIM,y=i/SIM|0;if(Math.hypot(x-SIM/2,y-SIM/2)<rad){
+        if(rnd()<0.04)spawnShards(x*4,y*4,G.rockL[i]>0?'rock':'soil',1,0.7);G.soil[i]=G.rockL[i]=G.hard[i]=0;G.cov[i]=0;any=true}}
+      if(any)G.dirty=[0,0,D,D];
+    }else if(G.sweep<0&&t<1.6){G.sweep=0;updateHud();spawnTwinkle(D/2,D/2,24,D*0.6);floatText(D/2,D*0.18,'完全発掘!')}
+    if(G.sweep>=0)G.sweep=Math.min(1.2,(t-0.7)/0.9);
+    if(t>2.0){G.sweep=-1;G.seq=null;showResult()}
+  }else if(G.seq==='break'){
+    G.crackT+=dt;
+    if(t>0.35&&!G.burst){G.burst=true;addTrauma(1);
+      for(let k=0;k<70;k++){const i=G.fossilIdx[Math.floor(rnd()*G.fossilIdx.length)];spawnShards((i%SIM)*4+2,Math.floor(i/SIM)*4+2,'fossil',1,1.3)}
+      spawnSpark(D/2,D/2,30);addFlash(D/2,D/2,D*0.5,'170,80,240',0.4)}
+    G.dark=Math.min(0.55,Math.max(0,(t-0.35)*0.9));
+    if(t>1.5){G.seq=null;showResult()}
+  }else if(G.seq==='end'){if(t>(G.reason==='time'?1.0:0.35)){G.seq=null;showResult()}}
+}
+
+// ================= 結果 =================
+function rankOf(s){return s>=90?'S':s>=75?'A':s>=55?'B':'C'}
+let FX=[];const fxc=document.getElementById('fx'),fxx=fxc.getContext('2d');
+function confetti(n){const r=fxc.getBoundingClientRect(),dpr=Math.min(2,devicePixelRatio||1);fxc.width=r.width*dpr;fxc.height=r.height*dpr;
+  const cols=['#ffd27a','#f0b44c','#fff3d8','#8fd19e','#9cc8ff','#e7a3ff'];
+  for(let k=0;k<n;k++)FX.push({x:fxc.width*(0.2+rnd()*0.6),y:fxc.height*0.35,vx:(rnd()-0.5)*900*dpr,vy:(-500-rnd()*700)*dpr,r:rnd()*6,vr:(rnd()-0.5)*14,w:(5+rnd()*5)*dpr,h:(8+rnd()*8)*dpr,c:cols[rnd()*cols.length|0],life:2.5+rnd(),dpr})}
+function drawFx(dt){if(!FX.length)return;fxx.clearRect(0,0,fxc.width,fxc.height);
+  for(const p of FX){p.life-=dt;p.vy+=1200*p.dpr*dt;p.vx*=0.985;p.vy*=0.985;p.x+=p.vx*dt;p.y+=p.vy*dt;p.r+=p.vr*dt;
+    fxx.save();fxx.translate(p.x,p.y);fxx.rotate(p.r);fxx.scale(1,Math.cos(p.r*1.7));fxx.globalAlpha=Math.min(1,p.life);fxx.fillStyle=p.c;fxx.fillRect(-p.w/2,-p.h/2,p.w,p.h);fxx.restore()}
+  FX=FX.filter(p=>p.life>0&&p.y<fxc.height+50);if(!FX.length)fxx.clearRect(0,0,fxc.width,fxc.height)}
+function showResult(){
+  const reason=G.reason,exp=G.exp,durR=Math.max(0,1-G.totalDmg/G.R.dur);
+  const ok=reason!=='broken'&&exp>=0.3,score=ok?Math.round(exp*70+durR*30):0;
+  const sp=SPECIES[G.rock.sp],part=PARTS[G.rock.part];
+  document.getElementById('rStars').textContent='★'.repeat(sp.r)+'☆'.repeat(4-sp.r);
+  document.getElementById('rName').textContent=sp.n+'の'+part;
+  document.getElementById('rDetail').textContent=`露出 ${Math.floor(exp*100)}% ・ 残り耐久 ${Math.floor(durR*100)}%`;
+  const row=document.getElementById('rScoreRow'),stamp=document.getElementById('stamp'),badge=document.getElementById('rBadge');
+  stamp.className='stamp';badge.innerHTML='';document.getElementById('rScore').textContent='0';
+  // 化石の絵
+  const dm=G.cellDmg;const fc=renderFossil(G.domeHi,D,FMARGIN,(x,y)=>{const r0=BI0[y]*SIM,r1=BI1[y]*SIM,i0=BI0[x],i1=BI1[x],fx=BF[x],fy=BF[y];
+    const t=(dm[r0+i0]+(dm[r0+i1]-dm[r0+i0])*fx)*(1-fy)+(dm[r1+i0]+(dm[r1+i1]-dm[r1+i0])*fx)*fy;return t>0.004?Math.min(1,t/0.45):0});
+  let bx0=D,by0=D,bx1=0,by1=0;for(let y=0;y<D;y++)for(let x=0;x<D;x++)if(G.domeHi[y*D+x]>0){if(x<bx0)bx0=x;if(x>bx1)bx1=x;if(y<by0)by0=y;if(y>by1)by1=y}
+  const rc=document.getElementById('resultCanvas');show('result');
+  const dpr=Math.min(2,devicePixelRatio||1);rc.width=rc.clientWidth*dpr;rc.height=rc.clientHeight*dpr;const c2=rc.getContext('2d');
+  const bw=bx1-bx0+8,bh=by1-by0+8,sc=Math.min(rc.width*0.84/bw,rc.height*0.8/bh),dw=bw*sc,dh=bh*sc,ox=(rc.width-dw)/2,oy=(rc.height-dh)/2;
+  c2.shadowColor='rgba(0,0,0,.6)';c2.shadowBlur=14*dpr;c2.shadowOffsetY=6*dpr;c2.imageSmoothingQuality='high';
+  if(reason==='broken'){ // 砕けた化石:ずらして描く
+    const pieces=6;for(let k=0;k<pieces;k++){c2.save();c2.beginPath();const a0=k/pieces*Math.PI*2,a1=(k+1)/pieces*Math.PI*2,cx=rc.width/2,cy=rc.height/2;
+      c2.moveTo(cx,cy);c2.arc(cx,cy,rc.width,a0,a1);c2.closePath();c2.clip();const m=(a0+a1)/2;c2.translate(Math.cos(m)*10*dpr,Math.sin(m)*10*dpr);c2.rotate((rnd()-0.5)*0.12);
+      c2.drawImage(fc,bx0-4,by0-4,bw,bh,ox,oy,dw,dh);c2.restore()}
+  }else c2.drawImage(fc,bx0-4,by0-4,bw,bh,ox,oy,dw,dh);
+  if(!ok){row.innerHTML=`<div class="r-fail">${reason==='broken'?'化石が砕けてしまった…':(reason==='time'?'時間切れ。':'')+'ほとんど掘り出せなかった…'}</div>`;return}
+  row.innerHTML='<div class="r-score"><span id="rScore">0</span><small>点</small></div><div class="stamp" id="stamp"></div>';
+  const rec=dexData[G.rock.sp]||(dexData[G.rock.sp]={parts:{}}),prev=rec.parts[G.rock.part];
+  const isNew=prev===undefined,isUp=!isNew&&score>prev;
+  if(isNew||isUp)rec.parts[G.rock.part]=score;saveDex();
+  const completed=isNew&&Object.keys(rec.parts).length===4;
+  const se=document.getElementById('rScore'),st=document.getElementById('stamp');const t0=performance.now(),dur=Math.min(1200,300+score*10);let lastV=-1;
+  (function step(){const k=Math.min(1,(performance.now()-t0)/dur),v=Math.round(score*(1-Math.pow(1-k,3)));if(v!==lastV){se.textContent=v;if(v%3===0)sCount();lastV=v}
+    if(k<1)requestAnimationFrame(step);else{const rk=rankOf(score);st.textContent=rk;st.className='stamp on '+rk;sStamp();buzz(30);
+      setTimeout(()=>{badge.innerHTML=isNew?'<span class="badge new">NEW! 図鑑に登録</span>':isUp?`<span class="badge up">最高記録更新!(前回 ${prev}点)</span>`:`<span class="badge keep">記録 ${prev}点(更新ならず)</span>`;
+        requestAnimationFrame(()=>badge.firstChild.classList.add('on'));
+        if(isNew||isUp){confetti(isNew?90:60);sFanfare(false)}
+        if(completed)setTimeout(()=>showAssembly(G.rock.sp),1300)},380)}})();
+}
+
+// ================= 全身骨格 =================
+const thumbCache={};
+function partCanvas(sp,part,size){const sh=makeShape(sp,part,RAR[SPECIES[sp].r].thick);return renderFossil(rasterDome(sh,size,0.05),size,0.05)}
+function thumbURL(sp,part){const k=sp+'-'+part;if(!thumbCache[k])thumbCache[k]=partCanvas(sp,part,96).toDataURL();return thumbCache[k]}
+function showAssembly(sp){
+  const st=document.getElementById('asmStage');st.innerHTML='';document.getElementById('asmName').textContent=SPECIES[sp].n;
+  document.getElementById('assembly').classList.add('on');
+  const W=st.clientWidth,H=st.clientHeight;
+  const lay=[[0,W*0.22,H*0.33,W*0.36],[1,W*0.55,H*0.38,W*0.5],[2,W*0.42,H*0.66,W*0.3],[3,W*0.72,H*0.64,W*0.36]];
+  lay.forEach(([part,x,y,s],k)=>{const cv=partCanvas(sp,part,192);cv.style.width=cv.style.height=s+'px';cv.style.left=(x-s/2)+'px';cv.style.top=(y-s/2)+'px';
+    cv.style.filter='drop-shadow(0 4px 6px rgba(0,0,0,.6))';const a=rnd()*Math.PI*2;cv.style.transform=`translate(${Math.cos(a)*W}px,${Math.sin(a)*H}px) rotate(${(rnd()-0.5)*90}deg)`;cv.style.opacity=0;
+    st.appendChild(cv);setTimeout(()=>{cv.style.opacity=1;cv.style.transform='none';tn({f:300+k*80,f2:200+k*60,dur:0.15,g:0.3})},250+k*260)});
+  setTimeout(()=>{sFanfare(true);confetti(140)},250+4*260+300);
+}
+
+// ================= 図鑑 =================
+let dexFrom='title';
+document.getElementById('dexBack').onclick=()=>{sUI();if(dexFrom==='select')toSelect();else if(dexFrom==='result'){show('result')}else toTitle()};
+function openDex(){
+  dexFrom=CUR==='dex'?dexFrom:CUR;
+  document.getElementById('dexProgress').textContent=progressText();
+  const el=document.getElementById('dex');el.innerHTML='';
+  SPECIES.forEach((sp,i)=>{const rec=(dexData[i]&&dexData[i].parts)||{},got=Object.keys(rec).length;
+    const d=document.createElement('div');d.className='dex-item'+(got===4?' done':'');
+    d.innerHTML=`<div class="dex-head"><span class="nm">${got?sp.n:'？？？'}</span><span class="st">${'★'.repeat(sp.r)}</span></div>
+      <div class="parts">${PARTS.map((p,k)=>rec[k]!==undefined?`<div class="part got"><img src="${thumbURL(i,k)}" alt=""><span>${p}</span><b>${rec[k]}</b></div>`:`<div class="part"><div class="q">?</div><span>${p}</span><b>—</b></div>`).join('')}</div>
+      ${got===4?`<div class="dex-done"><span>🦴 全身骨格 完成</span><button data-sp="${i}">骨格を見る</button></div>`:''}`;
+    el.appendChild(d)});
+  el.querySelectorAll('.dex-done button').forEach(b=>b.onclick=()=>{sUI();showAssembly(+b.dataset.sp)});
+  show('dex');
+}
+
+// ================= メインループ =================
+let last=performance.now();
+function loop(now){
+  const dt=Math.min(0.05,(now-last)/1000);last=now;
+  if(CUR==='title')drawTitle(now/1000,dt);
+  if(G&&CUR==='clean'){
+    if(G.freeze>0){G.freeze-=dt}
+    else{
+      if(!G.over){
+        G.time-=dt;
+        if(G.down&&G.tool!=='hammer')drillAt(G.px,G.py,dt);
+        if(G.totalDmg>=G.R.dur){G.totalDmg=G.R.dur;finish('broken')}
+        else if(G.time<=0){G.time=0;finish('time')}
+        else{G.hudT-=dt;if(G.hudT<=0){G.hudT=0.08;updateHud();checkMilestones();if(G.exp>=0.999)finish('clear')}
+          const sec=Math.ceil(G.time);if(sec<=10&&sec<G.lastSec){G.lastSec=sec;sTick()}}
+      }
+      if(G.seq)runSeq(dt);
+      updateParts(dt);
+    }
+    G.trauma=Math.max(0,G.trauma-dt*2.2);
+    drawBoard(dt);
+  }
+  drawFx(dt);
+  requestAnimationFrame(loop);
+}
+drawSndBtn();
+document.getElementById('titleProgress').textContent=progressText();
+(document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(()=>{});
+requestAnimationFrame(()=>{drawTitleBg();requestAnimationFrame(loop)});
+</script>
+</body>
+</html>
