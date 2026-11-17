@@ -917,8 +917,8 @@ function runSeq(dt){
     if(t<0.7){const rad=t/0.7*SIM*0.75;let any=false;
       for(let i=0;i<NS;i++){if(G.cov[i]<=0||!G.inRock[i])continue;const x=i%SIM,y=i/SIM|0;if(Math.hypot(x-SIM/2,y-SIM/2)<rad){
         if(rnd()<0.04)spawnShards(x*SC,y*SC,G.rockL[i]>0?'rock':'soil',1,0.7);G.soil[i]=G.rockL[i]=G.hard[i]=0;G.cov[i]=0;any=true}}
-      if(any)G.dirty=[0,0,D,D];
-    }else if(G.sweep<0&&t<1.6){G.sweep=0;updateHud();spawnTwinkle(D/2,D/2,24,D*0.6);floatText(D/2,D*0.18,'完全発掘!')}
+      if(any){G.crT=(G.crT||0)+dt;if(G.crT>=0.1){G.crT=0;G.dirty=[0,0,D,D]}}
+    }else if(G.sweep<0&&t<1.6){G.sweep=0;G.dirty=[0,0,D,D];updateHud();spawnTwinkle(D/2,D/2,24,D*0.6);floatText(D/2,D*0.18,'完全発掘!')}
     if(G.sweep>=0)G.sweep=Math.min(1.2,(t-0.7)/0.9);
     if(t>2.0){G.sweep=-1;G.seq=null;showResult()}
   }else if(G.seq==='break'){
@@ -942,6 +942,10 @@ function drawFx(dt){if(!FX.length)return;fxx.clearRect(0,0,fxc.width,fxc.height)
     fxx.save();fxx.translate(p.x,p.y);fxx.rotate(p.r);fxx.scale(1,Math.cos(p.r*1.7));fxx.globalAlpha=Math.min(1,p.life);fxx.fillStyle=p.c;fxx.fillRect(-p.w/2,-p.h/2,p.w,p.h);fxx.restore()}
   FX=FX.filter(p=>p.life>0&&p.y<fxc.height+50);if(!FX.length)fxx.clearRect(0,0,fxc.width,fxc.height)}
 function showResult(){
+  if(!G||G.resultShown)return;G.resultShown=true;G.down=false;drillOff();
+  try{showResultInner()}catch(e){reportErr(e);if(CUR!=='result')show('result')}
+}
+function showResultInner(){
   const reason=G.reason,exp=G.exp,durR=Math.max(0,1-G.totalDmg/G.R.dur);
   const ok=reason!=='broken'&&exp>=PASS,score=ok?Math.round(exp*70+durR*30):0;
   const sp=SPECIES[G.rock.sp],part=PARTS[G.rock.part];
@@ -1095,9 +1099,21 @@ async function loadRank(r){
 
 // ================= メインループ =================
 let last=performance.now();
+// エラーが起きても止まらないように、画面にエラー内容を出す
+function reportErr(e){try{console.error(e);let el=document.getElementById('errToast');if(!el){el=document.createElement('div');el.id='errToast';
+  el.style.cssText='position:absolute;left:10px;right:10px;bottom:10px;z-index:99;background:rgba(120,20,20,.92);color:#fff;font-size:12px;padding:8px 10px;border-radius:10px;white-space:pre-wrap;word-break:break-all;pointer-events:none';document.getElementById('app').appendChild(el)}
+  const m=(e&&(e.message||e))+'';const st=((e&&e.stack)||'').split('\n').slice(0,3).join('\n');el.textContent='エラー: '+m+'\n'+st;clearTimeout(el._t);el._t=setTimeout(()=>el.remove(),15000)}catch(_){}}
+window.addEventListener('error',ev=>reportErr(ev.error||ev.message));
+window.addEventListener('unhandledrejection',ev=>reportErr(ev.reason));
 function loop(now){
-  const dt=Math.min(0.05,(now-last)/1000);last=now;
+  try{loopBody(now)}catch(e){reportErr(e)}
+  requestAnimationFrame(loop);
+}
+function loopBody(now){
+  const real=(now-last)/1000,dt=Math.min(0.05,real);last=now;
   if(CUR==='title')drawTitle(now/1000,dt);
+  // 終了後に結果画面へ進めないときの保険
+  if(G&&G.over&&CUR==='clean'&&!G.resultShown){G.overT=(G.overT||0)+Math.min(real,0.5);if(G.overT>5){G.seq=null;G.sweep=-1;showResult()}}
   if(G&&CUR==='clean'){
     if(G.freeze>0){G.freeze-=dt}
     else{
@@ -1113,10 +1129,9 @@ function loop(now){
       updateParts(dt);
     }
     G.trauma=Math.max(0,G.trauma-dt*2.2);
-    drawBoard(dt);
+    try{drawBoard(dt)}catch(e){reportErr(e)}
   }
-  drawFx(dt);
-  requestAnimationFrame(loop);
+  try{drawFx(dt)}catch(e){FX=[];reportErr(e)}
 }
 drawSndBtn();
 document.getElementById('titleProgress').textContent=progressText();
