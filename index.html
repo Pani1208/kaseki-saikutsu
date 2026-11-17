@@ -190,6 +190,10 @@ button:active{transform:scale(.96)}
 .rank-msg a{color:var(--amber2)}
 .btn-x{display:inline-flex;align-items:center;gap:8px;margin-top:10px;font-size:14px;font-weight:800;padding:10px 18px;border-radius:99px;background:#000;color:#fff;border:1px solid rgba(255,255,255,.25);text-decoration:none}
 .btn-x svg{width:15px;height:15px}
+.share-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.btn-img{display:inline-flex;align-items:center;gap:7px;margin-top:10px;font-size:14px;font-weight:800;padding:10px 18px;border-radius:99px;background:linear-gradient(180deg,#ffc960,#e79c2c);color:#2b1806;box-shadow:0 3px 0 #9b5f14}
+.btn-img svg{width:16px;height:16px}
+.share-prev{width:100%;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,.5);-webkit-touch-callout:default;-webkit-user-select:auto;user-select:auto}
 .btn-rank{margin-top:10px;font-size:15px;padding:11px 20px;border-radius:99px;background:linear-gradient(180deg,#6a4c2a,#4a3420);border:1px solid var(--amber);color:var(--cream);font-weight:800;box-shadow:0 0 16px rgba(240,180,76,.2)}
 .name-in{width:100%;font:inherit;font-size:18px;font-weight:700;padding:13px 14px;border-radius:14px;border:1px solid var(--line);background:#15100d;color:var(--cream);outline:none;-webkit-user-select:text;user-select:text}
 .name-in:focus{border-color:var(--amber)}
@@ -293,6 +297,17 @@ button:active{transform:scale(.96)}
       <div class="reg-err" id="regErr"></div>
       <button class="btn-primary" id="regSend">登録する</button>
       <button class="btn-ghost" onclick="sUI();closeReg()">やめる</button>
+    </div>
+  </div>
+
+  <!-- 画像共有(共有メニューが使えないとき) -->
+  <div class="overlay" id="shareModal">
+    <div class="modal">
+      <h3>結果画像</h3>
+      <img class="share-prev" id="sharePrev" alt="結果画像">
+      <div class="reg-info" id="shareHelp">画像を<b>長押し</b>して保存し、Xの投稿に添付してください</div>
+      <div id="shareXSlot" style="display:flex;justify-content:center"></div>
+      <button class="btn-ghost" onclick="sUI();document.getElementById('shareModal').classList.remove('on')">とじる</button>
     </div>
   </div>
 
@@ -967,7 +982,7 @@ function showResultInner(){
       c2.moveTo(cx,cy);c2.arc(cx,cy,rc.width,a0,a1);c2.closePath();c2.clip();const m=(a0+a1)/2;c2.translate(Math.cos(m)*10*dpr,Math.sin(m)*10*dpr);c2.rotate((rnd()-0.5)*0.12);
       c2.drawImage(fc,bx0-4,by0-4,bw,bh,ox,oy,dw,dh);c2.restore()}
   }else c2.drawImage(fc,bx0-4,by0-4,bw,bh,ox,oy,dw,dh);
-  SHARE={species:G.rock.sp,part:G.rock.part,reason,ok,score,pos:null};renderShare();
+  SHARE={species:G.rock.sp,part:G.rock.part,reason,ok,score,exposure:Math.floor(exp*100),durability:Math.floor(durR*100),pos:null};renderShare();
   if(!ok){const msg=reason==='broken'?'化石が砕けてしまった…':(reason==='time'?'時間切れ。':'')+'掘り出しが足りなかった…';
     row.innerHTML=`<div style="display:flex;flex-direction:column;align-items:center;gap:6px"><div class="r-fail">${msg}</div>${reason==='broken'?'':'<div class="r-detail">成功には露出60%以上が必要です</div>'}</div>`;return}
   row.innerHTML='<div class="r-score"><span id="rScore">0</span><small>点</small></div><div class="stamp" id="stamp"></div>';
@@ -1026,10 +1041,61 @@ function shareText(){
   if(!SHARE.ok)return `化石採掘で${what}に挑戦したけど、掘り出しきれなかった…⛏️\n#化石採掘`;
   return `化石採掘で${what}を${SHARE.score}点(${rankOf(SHARE.score)}ランク)で掘り出した!🦴`+(SHARE.pos?`\n綺麗な化石ランキング★${sp.r}で${SHARE.pos}位🏆`:'')+`\n#化石採掘`;
 }
+const X_SVG='<svg viewBox="0 0 24 24" fill="#fff"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>';
+function xIntentURL(){return 'https://x.com/intent/tweet?text='+encodeURIComponent(shareText())+'&url='+encodeURIComponent(SITE_URL)}
 function renderShare(){
   const slot=document.getElementById('rShareSlot');if(!SHARE){slot.innerHTML='';return}
-  const url='https://x.com/intent/tweet?text='+encodeURIComponent(shareText())+'&url='+encodeURIComponent(SITE_URL);
-  slot.innerHTML=`<a class="btn-x" href="${url}" target="_blank" rel="noopener" onclick="sUI()"><svg viewBox="0 0 24 24" fill="#fff"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>Xで共有</a>`;
+  slot.innerHTML=`<div class="share-row"><button class="btn-img" id="btnImgShare"><svg viewBox="0 0 24 24" fill="none" stroke="#2b1806" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/></svg>画像で共有</button><a class="btn-x" href="${xIntentURL()}" target="_blank" rel="noopener" onclick="sUI()">${X_SVG}Xに投稿</a></div>`;
+  document.getElementById('btnImgShare').onclick=shareImage;
+  SHARE.blob=null;SHARE.url=null;const tok=SHARE.tok=Math.random();
+  makeShareImage().then(cv=>{if(SHARE&&SHARE.tok===tok){SHARE.url=cv.toDataURL('image/png');cv.toBlob(b=>{if(SHARE&&SHARE.tok===tok)SHARE.blob=b},'image/png')}}).catch(reportErr);
+}
+function fitFont(c,text,maxW,size,fam){let z=size;do{c.font=`${z}px ${fam}`;if(c.measureText(text).width<=maxW)break;z-=2}while(z>12);return z}
+async function makeShareImage(){
+  try{if(document.fonts){await Promise.race([Promise.all([document.fonts.load('40px "Dela Gothic One"','化石採掘0123'),document.fonts.load('700 30px "M PLUS Rounded 1c"','露出耐久')]),new Promise(r=>setTimeout(r,1500))])}}catch(e){}
+  const W=1200,H=675,cv=document.createElement('canvas');cv.width=W;cv.height=H;const c=cv.getContext('2d');
+  const DELA='"Dela Gothic One","Hiragino Sans",sans-serif',MPR='"M PLUS Rounded 1c","Hiragino Sans",sans-serif';
+  let g=c.createLinearGradient(0,0,0,H);g.addColorStop(0,'#33261c');g.addColorStop(1,'#120d0a');c.fillStyle=g;c.fillRect(0,0,W,H);
+  // 地層の線
+  c.globalAlpha=0.18;for(let k=0;k<6;k++){c.strokeStyle=k%2?'#c8a070':'#8a6a4a';c.lineWidth=3;c.beginPath();for(let x=0;x<=W;x+=40){const y=H*0.62+k*42+Math.sin(x/170+k)*10;x?c.lineTo(x,y):c.moveTo(x,y)}c.stroke()}c.globalAlpha=1;
+  g=c.createRadialGradient(330,330,0,330,330,420);g.addColorStop(0,'rgba(255,210,140,.22)');g.addColorStop(1,'rgba(255,210,140,0)');c.fillStyle=g;c.fillRect(0,0,W,H);
+  // 化石パネル
+  const px=40,py=40,pw=600,ph=595;c.save();c.beginPath();c.roundRect?c.roundRect(px,py,pw,ph,28):c.rect(px,py,pw,ph);c.clip();
+  g=c.createRadialGradient(px+pw/2,py+ph*0.42,40,px+pw/2,py+ph/2,pw*0.75);g.addColorStop(0,'#33403f');g.addColorStop(1,'#1a2022');c.fillStyle=g;c.fillRect(px,py,pw,ph);
+  const rc=document.getElementById('resultCanvas');if(rc.width&&rc.height){const sc=Math.min(pw/rc.width,ph/rc.height)*1.06,dw=rc.width*sc,dh=rc.height*sc;c.drawImage(rc,px+(pw-dw)/2,py+(ph-dh)/2,dw,dh)}
+  c.restore();c.strokeStyle='rgba(255,230,190,.15)';c.lineWidth=2;c.beginPath();c.roundRect?c.roundRect(px,py,pw,ph,28):c.rect(px,py,pw,ph);c.stroke();
+  // 右側の文字
+  const X0=690,TW=470,sp=SPECIES[SHARE.species];
+  c.textBaseline='alphabetic';c.textAlign='left';
+  c.font=`40px ${DELA}`;g=c.createLinearGradient(0,60,0,110);g.addColorStop(0,'#fff3d0');g.addColorStop(1,'#e59a2e');c.fillStyle=g;c.fillText('化石採掘',X0,105);
+  c.fillStyle='#f0b44c';c.font=`700 34px ${MPR}`;c.fillText('★'.repeat(sp.r)+'☆'.repeat(4-sp.r),X0,170);
+  const nm=sp.n+'の'+PARTS[SHARE.part];fitFont(c,nm,TW,50,DELA);c.fillStyle='#f4ece0';c.fillText(nm,X0,240);
+  if(SHARE.ok){
+    c.font=`150px ${DELA}`;c.fillStyle='#f2e5cb';c.fillText(String(SHARE.score),X0-6,420);const sw=c.measureText(String(SHARE.score)).width;
+    c.font=`44px ${DELA}`;c.fillText('点',X0+sw+4,420);
+    const rk=rankOf(SHARE.score),cx=X0+TW-60,cy=345,col=rk==='S'?'#f0b44c':'#e0473c';
+    c.save();c.translate(cx,cy);c.rotate(-0.24);c.strokeStyle=col;c.lineWidth=8;c.beginPath();c.arc(0,0,58,0,7);c.stroke();c.lineWidth=3;c.globalAlpha=0.5;c.beginPath();c.arc(0,0,47,0,7);c.stroke();c.globalAlpha=1;
+    c.fillStyle=col;c.font=`64px ${DELA}`;c.textAlign='center';c.textBaseline='middle';c.fillText(rk,0,4);c.restore();c.textAlign='left';c.textBaseline='alphabetic';
+  }else{
+    const t=SHARE.reason==='broken'?'化石が砕けた…':'掘り出しきれず…';fitFont(c,t,TW,58,DELA);c.fillStyle='#d9a8ff';c.fillText(t,X0,380);
+  }
+  c.font=`700 28px ${MPR}`;c.fillStyle='#b9aa98';c.fillText(`露出 ${SHARE.exposure}% ・ 残り耐久 ${SHARE.durability}%`,X0,480);
+  if(SHARE.pos){c.font=`800 32px ${MPR}`;c.fillStyle='#ffd27a';c.fillText(`🏆 ランキング★${sp.r}で ${SHARE.pos}位`,X0,540)}
+  c.font=`700 22px ${MPR}`;c.fillStyle='#8f8070';c.fillText('#化石採掘  pani1208.github.io/kaseki-saikutsu',X0,620);
+  return cv;
+}
+async function shareImage(){
+  sUI();if(!SHARE)return;
+  if(!SHARE.url){const cv=await makeShareImage();SHARE.url=cv.toDataURL('image/png')}
+  const text=shareText()+'\n'+SITE_URL;
+  try{
+    if(SHARE.blob&&navigator.canShare){const f=new File([SHARE.blob],'kaseki-saikutsu.png',{type:'image/png'});
+      if(navigator.canShare({files:[f]})){await navigator.share({files:[f],text});return}}
+  }catch(e){if(e&&e.name==='AbortError')return}
+  // 共有メニューが使えないときは、画像を表示して保存してもらう
+  document.getElementById('sharePrev').src=SHARE.url;
+  document.getElementById('shareXSlot').innerHTML=`<a class="btn-x" href="${xIntentURL()}" target="_blank" rel="noopener" onclick="sUI()">${X_SVG}Xの投稿画面を開く</a>`;
+  document.getElementById('shareModal').classList.add('on');
 }
 
 // ================= ランキング(Supabase) =================
