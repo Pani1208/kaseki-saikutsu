@@ -724,8 +724,8 @@ function hammerAt(gx,gy){
   const X=gx*SC,Y=gy*SC,big=0.6+lv*0.2;
   if(OP.total>0.01||OP.dmg>0){
     const isHard=OP.hard>2.5*GS*GS*lv/3;
-    if(isHard){sHard(lv);G.freeze=0.03+lv*0.01;addTrauma(0.2+lv*0.1);addFlash(X,Y,30+lv*14,'255,255,255',0.12);spawnShards(X,Y,'hard',8+lv*5,big*1.2);buzz(15+lv*4)}
-    else{sHammer(lv);G.freeze=0.015+lv*0.007;addTrauma(0.1+lv*0.08);addFlash(X,Y,22+lv*10,'255,240,215',0.09);buzz(6+lv*3)}
+    if(isHard){sHard(lv);G.freeze=0.03+lv*0.01;addTrauma([0,0.25,0.4,0.75][lv]);addFlash(X,Y,30+lv*14,'255,255,255',0.12);spawnShards(X,Y,'hard',8+lv*5,big*1.2);buzz(15+lv*4)}
+    else{sHammer(lv);G.freeze=0.015+lv*0.01;addTrauma([0,0.12,0.24,0.58][lv]);addFlash(X,Y,22+lv*10,'255,240,215',0.09);buzz(6+lv*3)}
     const tot=OP.soil+OP.rock+OP.hard||1;
     const ns=4+lv*4;spawnShards(X,Y,'soil',Math.round(ns*OP.soil/tot),big);spawnShards(X,Y,'rock',Math.round(ns*OP.rock/tot),big*1.1);if(!isHard)spawnShards(X,Y,'hard',Math.round(ns*0.7*OP.hard/tot),big*1.2);
     spawnDust(X,Y,OP.soil>OP.rock?'soil':'rock',lv*2);
@@ -742,7 +742,7 @@ function drillAt(gx,gy,dt){
   if(OP.total>0.002){const m=OP.hard>OP.rock&&OP.hard>OP.soil?'hard':OP.rock>OP.soil?'rock':'soil';
     if(rnd()<({d1:0.35,d2:0.6,d3:0.9})[G.tool])spawnGrit(X,Y,m,G.tool==='d3'?3:1);
     if(G.tool==='d3'&&rnd()<0.15)spawnDust(X,Y,m,1);
-    if(G.tool==='d3')addTrauma(0.03)}
+    }
   if(OP.dmg>0.0002){if(rnd()<0.5)spawnSpark(X,Y,2);if(OP.dmg>0.009&&rnd()<0.3)document.getElementById('gauge').classList.add('hit')}
   return OP;
 }
