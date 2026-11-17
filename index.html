@@ -236,6 +236,7 @@ button:active{transform:scale(.96)}
 #s-rank{padding:14px 14px 24px;gap:12px;background:linear-gradient(180deg,#221a14,#15100c)}
 .tabs{display:flex;gap:6px;overflow-x:auto}
 .tabs button{flex:1;min-width:52px;padding:9px 6px;border-radius:12px;background:rgba(255,235,200,.06);border:1px solid var(--line);font-weight:800;font-size:13px;color:var(--sub);white-space:nowrap}
+.tabs.mode button{font-size:14px;padding:11px 6px}
 .tabs button.sel{background:linear-gradient(180deg,#5a4126,#3a2a1b);border-color:var(--amber);color:var(--cream)}
 .rank-list{display:flex;flex-direction:column;gap:7px}
 .rk-row{display:grid;grid-template-columns:38px 46px 1fr auto;align-items:center;gap:10px;background:linear-gradient(180deg,#2b221b,#211a15);border:1px solid var(--line);border-radius:14px;padding:8px 12px 8px 8px}
@@ -355,14 +356,15 @@ button:active{transform:scale(.96)}
   <section class="screen" id="s-rank">
     <div class="bar">
       <button class="icon-btn" id="rankBack">‹</button>
-      <div class="bar-title">綺麗な化石ランキング <span style="font-size:13px;color:var(--sub)">TOP10</span></div>
+      <div class="bar-title">ランキング <span style="font-size:13px;color:var(--sub)">TOP10</span></div>
     </div>
+    <div class="tabs mode" id="rankMode"><button data-m="fossil" class="sel">🦴 化石</button><button data-m="skel">🦖 全身骨格</button></div>
     <div class="tabs" id="rankTabs"><button data-r="0" class="sel">総合</button><button data-r="1">★1</button><button data-r="2">★2</button><button data-r="3">★3</button><button data-r="4">★4</button></div>
     <div class="rank-list" id="rankList"></div>
   </section>
 
   <!-- ランキング登録 -->
-  <div class="overlay" id="regModal">
+  <div class="overlay" id="regModal" style="z-index:70">
     <div class="modal">
       <h3>ランキングに登録</h3>
       <div class="reg-info" id="regInfo"></div>
@@ -408,6 +410,7 @@ button:active{transform:scale(.96)}
       <div class="asm-name" id="asmName"></div>
       <div class="asm-count" id="asmCount"></div>
       <div class="asm-after" id="asmAfter">
+        <div id="asmReg" style="display:flex;justify-content:center"></div>
         <div id="asmShare" class="share-row"></div>
         <button class="btn-primary" id="asmClose">とじる</button>
       </div>
@@ -1189,6 +1192,8 @@ function asmPrepShare(sp,done){
   const box=document.getElementById('asmShare');
   box.innerHTML=`<button class="btn-img" id="btnAsmShare"><svg viewBox="0 0 24 24" fill="none" stroke="#2b1806" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/></svg>画像で共有</button>`;
   document.getElementById('btnAsmShare').onclick=()=>{sUI();shareWith(ASM)};
+  const rg=document.getElementById('asmReg');rg.innerHTML='<button class="btn-rank" id="btnAsmReg" style="margin-top:0">🏆 骨格ランキングに登録</button>';
+  document.getElementById('btnAsmReg').onclick=()=>{sUI();openReg('skel')};
   const tok=ASM;makeAsmImage(sp,avg,done).then(cv=>{if(ASM!==tok)return;ASM.url=cv.toDataURL('image/png');cv.toBlob(b=>{if(ASM===tok)ASM.blob=b},'image/png')}).catch(reportErr);
 }
 
@@ -1349,17 +1354,29 @@ let RES=null,rankTab=0,rankFrom='title';
 async function sbGet(q,extra){const r=await fetch(SB_URL+'/rest/v1/ranking?'+q,{headers:Object.assign({},SB_H,extra||{})});if(!r.ok)throw new Error('HTTP '+r.status);return r}
 function rankButton(){
   const slot=document.getElementById('rRankSlot');slot.innerHTML='';if(!RES||RES.sent)return;
-  const b=document.createElement('button');b.className='btn-rank';b.textContent='🏆 ランキングに登録';b.onclick=()=>{sUI();openReg()};slot.appendChild(b);
+  const b=document.createElement('button');b.className='btn-rank';b.textContent='🏆 ランキングに登録';b.onclick=()=>{sUI();openReg('fossil')};slot.appendChild(b);
 }
-function openReg(){
-  const sp=SPECIES[RES.species];
-  document.getElementById('regInfo').innerHTML=`${'★'.repeat(sp.r)} ${esc(sp.n)}の${PARTS[RES.part]}<br><b style="font-size:22px;color:#f2e5cb">${RES.score}点</b>(露出${RES.exposure}% ・ 耐久${RES.durability}%)`;
+// 登録する対象:REG={kind:'fossil'} は1回の採掘、{kind:'skel'} は全身骨格の平均点
+let REG=null,rankMode='fossil';
+function openReg(kind){
+  kind=kind||'fossil';
+  if(kind==='fossil'){const sp=SPECIES[RES.species];REG={kind,table:'ranking',rarity:RES.rarity,
+      body:{species:RES.species,part:RES.part,rarity:RES.rarity,score:RES.score,exposure:RES.exposure,durability:RES.durability},
+      info:`${'★'.repeat(sp.r)} ${esc(sp.n)}の${PARTS[RES.part]}<br><b style="font-size:22px;color:#f2e5cb">${RES.score}点</b>(露出${RES.exposure}% ・ 耐久${RES.durability}%)`}}
+  else{const sp=SPECIES[ASM.sp],rec=dexData[ASM.sp].parts,ps=[0,1,2,3].map(k=>rec[k]),sum=ps.reduce((x,y)=>x+y,0),avg=Math.round(sum/4);
+    REG={kind,table:'skeleton_ranking',rarity:sp.r,sum,body:{species:ASM.sp,rarity:sp.r,p0:ps[0],p1:ps[1],p2:ps[2],p3:ps[3],avg},
+      info:`${'★'.repeat(sp.r)} ${esc(sp.n)}の全身骨格<br><b style="font-size:22px;color:#f2e5cb">平均${avg}点</b>(頭${ps[0]}・胴${ps[1]}・腕${ps[2]}・脚${ps[3]})`}}
+  document.getElementById('regInfo').innerHTML=REG.info;
   const inp=document.getElementById('regName');inp.value=settings.name||'';document.getElementById('regErr').textContent='';
   document.getElementById('regSend').disabled=false;document.getElementById('regModal').classList.add('on');setTimeout(()=>inp.focus(),300);
 }
 function closeReg(){document.getElementById('regModal').classList.remove('on')}
+function saveMyId(table,id){const key=table==='ranking'?'dinoMyIds':'dinoMySkel';const arr=table==='ranking'?myIds:mySkel;arr.push(id);try{localStorage.setItem(key,JSON.stringify(arr.slice(-200)))}catch(e){}}
+let mySkel=[];try{mySkel=JSON.parse(localStorage.getItem('dinoMySkel')||'[]')||[]}catch(e){}
+async function sbCount(table,q){const r=await fetch(SB_URL+'/rest/v1/'+table+'?'+q,{headers:Object.assign({'Prefer':'count=exact','Range':'0-0'},SB_H)});
+  if(!r.ok)throw new Error('HTTP '+r.status);const cr=r.headers.get('content-range');return cr&&cr.includes('/')?+cr.split('/')[1]:null}
 document.getElementById('regSend').onclick=async()=>{
-  audioInit();const err=document.getElementById('regErr'),btn=document.getElementById('regSend');
+  audioInit();const err=document.getElementById('regErr'),btn=document.getElementById('regSend');if(!REG)return;
   const name=document.getElementById('regName').value.replace(/[\u0000-\u001f\u007f]/g,'').trim();
   if(!name){err.textContent='名前を入れてください';return}
   if([...name].length>10){err.textContent='名前は10文字までです';return}
@@ -1367,34 +1384,49 @@ document.getElementById('regSend').onclick=async()=>{
   const last=+(settings.lastSend||0);if(Date.now()-last<20000){err.textContent='少し時間をおいてからもう一度どうぞ';return}
   btn.disabled=true;err.textContent='送信中…';
   try{
-    const body={name,species:RES.species,part:RES.part,rarity:RES.rarity,score:RES.score,exposure:RES.exposure,durability:RES.durability};
-    const r=await fetch(SB_URL+'/rest/v1/ranking',{method:'POST',headers:Object.assign({'Content-Type':'application/json','Prefer':'return=representation'},SB_H),body:JSON.stringify(body)});
+    const body=Object.assign({name},REG.body);
+    const r=await fetch(SB_URL+'/rest/v1/'+REG.table,{method:'POST',headers:Object.assign({'Content-Type':'application/json','Prefer':'return=representation'},SB_H),body:JSON.stringify(body)});
     if(!r.ok)throw new Error('HTTP '+r.status);
-    const rows=await r.json();if(rows&&rows[0]&&rows[0].id){myIds.push(rows[0].id);try{localStorage.setItem('dinoMyIds',JSON.stringify(myIds.slice(-200)))}catch(e){}}
-    settings.name=name;settings.lastSend=Date.now();saveSet();RES.sent=true;
+    const rows=await r.json();if(rows&&rows[0]&&rows[0].id)saveMyId(REG.table,rows[0].id);
+    settings.name=name;settings.lastSend=Date.now();saveSet();
     // 順位を数える
-    let pos=null;try{const q=`select=id&rarity=eq.${RES.rarity}&or=(score.gt.${RES.score},and(score.eq.${RES.score},durability.gt.${RES.durability}))`;
-      const c=await sbGet(q,{'Prefer':'count=exact','Range':'0-0'});const cr=c.headers.get('content-range');if(cr&&cr.includes('/'))pos=+cr.split('/')[1]+1}catch(e){}
-    closeReg();sFanfare(false);confetti(50);if(SHARE){SHARE.pos=pos;renderShare()}
-    document.getElementById('rRankSlot').innerHTML=`<div class="badge new on" style="margin-top:10px">🏆 登録しました${pos?`!★${RES.rarity}で ${pos}位`:''}</div><div style="margin-top:8px"><button class="btn-ghost" style="padding:8px 16px;font-size:13px" onclick="sUI();openRank(${RES.rarity})">ランキングを見る</button></div>`;
+    let pos=null;try{
+      const q=REG.kind==='fossil'?`select=id&rarity=eq.${REG.rarity}&or=(score.gt.${body.score},and(score.eq.${body.score},durability.gt.${body.durability}))`:`select=id&rarity=eq.${REG.rarity}&avg=gt.${body.avg}`;
+      const n=await sbCount(REG.table,q);if(n!==null)pos=n+1}catch(e){}
+    closeReg();sFanfare(false);confetti(50);
+    const msg=`<div class="badge new on" style="margin-top:10px">🏆 登録しました${pos?`!★${REG.rarity}で ${pos}位`:''}</div><div style="margin-top:8px"><button class="btn-ghost" style="padding:8px 16px;font-size:13px" onclick="sUI();openRank(${REG.rarity},'${REG.kind}')">ランキングを見る</button></div>`;
+    if(REG.kind==='fossil'){RES.sent=true;if(SHARE){SHARE.pos=pos;renderShare()}document.getElementById('rRankSlot').innerHTML=msg}
+    else{ASM.sent=true;document.getElementById('asmReg').innerHTML=`<div style="display:flex;flex-direction:column;align-items:center">${msg}</div>`;
+      if(pos){ASM.text=ASM.text.replace('\n#化石採掘',`\n骨格ランキング★${REG.rarity}で${pos}位🏆\n#化石採掘`)}}
   }catch(e){btn.disabled=false;err.innerHTML=location.hostname.endsWith('github.io')?'送信できませんでした。通信状況を確認してもう一度お試しください':`ここでは送信できません。<a href="${SITE_URL}" target="_blank" rel="noopener" style="color:#ffd27a">公開サイト</a>から遊ぶと登録できます`}
 };
 document.getElementById('regName').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('regSend').click()});
 document.querySelectorAll('#rankTabs button').forEach(b=>b.onclick=()=>{sUI();loadRank(+b.dataset.r)});
+document.querySelectorAll('#rankMode button').forEach(b=>b.onclick=()=>{sUI();rankMode=b.dataset.m;loadRank(rankTab)});
 document.getElementById('rankBack').onclick=()=>{sUI();if(rankFrom==='result')show('result');else toTitle()};
-function openRank(r){rankFrom=CUR==='rank'?rankFrom:CUR;show('rank');loadRank(r||0)}
+function openRank(r,mode){rankFrom=CUR==='rank'?rankFrom:CUR;if(mode)rankMode=mode;if(document.getElementById('assembly').classList.contains('on'))asmClose();show('rank');loadRank(r||0)}
 async function loadRank(r){
   rankTab=r;document.querySelectorAll('#rankTabs button').forEach(b=>b.classList.toggle('sel',+b.dataset.r===r));
-  const el=document.getElementById('rankList');el.innerHTML='<div class="rank-msg">読み込み中…</div>';
+  document.querySelectorAll('#rankMode button').forEach(b=>b.classList.toggle('sel',b.dataset.m===rankMode));
+  const mode=rankMode,el=document.getElementById('rankList');el.innerHTML='<div class="rank-msg">読み込み中…</div>';
   try{
-    const q='select=id,name,species,part,rarity,score,exposure,durability,created_at'+(r?`&rarity=eq.${r}`:'')+'&order=score.desc,durability.desc,created_at.asc&limit=10';
-    const rows=await (await sbGet(q)).json();
-    if(rankTab!==r)return;
+    let rows;
+    if(mode==='fossil'){
+      const q='select=id,name,species,part,rarity,score,exposure,durability,created_at'+(r?`&rarity=eq.${r}`:'')+'&order=score.desc,durability.desc,created_at.asc&limit=10';
+      rows=await (await sbGet(q)).json();
+    }else{
+      const q='select=id,name,species,rarity,p0,p1,p2,p3,avg,created_at'+(r?`&rarity=eq.${r}`:'')+'&order=avg.desc,created_at.asc&limit=10';
+      const res=await fetch(SB_URL+'/rest/v1/skeleton_ranking?'+q,{headers:SB_H});if(!res.ok)throw new Error('HTTP '+res.status);rows=await res.json();
+    }
+    if(rankTab!==r||rankMode!==mode)return;
     if(!rows.length){el.innerHTML='<div class="rank-msg">まだ誰も登録していません。<br>一番乗りを目指そう!</div>';return}
-    el.innerHTML=rows.map((x,i)=>{const sp=SPECIES[x.species]||{n:'?',r:x.rarity},d=new Date(x.created_at),no=i+1;
-      return `<div class="rk-row${myIds.includes(x.id)?' me':''}"><div class="rk-no${no<=3?' g'+no:''}">${no}</div><img src="${thumbURL(x.species,x.part)}" alt="">
-        <div class="rk-main"><div class="rk-name">${esc(x.name)}${myIds.includes(x.id)?' <span style="font-size:11px;color:#f0b44c">(あなた)</span>':''}</div><div class="rk-sub">${'★'.repeat(sp.r)} ${esc(sp.n)}の${PARTS[x.part]||''} ・ ${d.getMonth()+1}/${d.getDate()}</div></div>
-        <div class="rk-score">${x.score}<small>${rankOf(x.score)}・耐久${x.durability}</small></div></div>`}).join('');
+    el.innerHTML=rows.map((x,i)=>{const sp=SPECIES[x.species]||{n:'?',r:x.rarity},d=new Date(x.created_at),no=i+1,me=(mode==='fossil'?myIds:mySkel).includes(x.id);
+      const img=mode==='fossil'?thumbURL(x.species,x.part):compositeURL(x.species,[0,1,2,3]);
+      const sub=mode==='fossil'?`${esc(sp.n)}の${PARTS[x.part]||''}`:`${esc(sp.n)} ・ 頭${x.p0} 胴${x.p1} 腕${x.p2} 脚${x.p3}`;
+      const sc=mode==='fossil'?`${x.score}<small>${rankOf(x.score)}・耐久${x.durability}</small>`:`${x.avg}<small>平均点</small>`;
+      return `<div class="rk-row${me?' me':''}"><div class="rk-no${no<=3?' g'+no:''}">${no}</div><img src="${img}" alt=""${mode==='skel'?' style="padding:1px"':''}>
+        <div class="rk-main"><div class="rk-name">${esc(x.name)}${me?' <span style="font-size:11px;color:#f0b44c">(あなた)</span>':''}</div><div class="rk-sub">${'★'.repeat(sp.r)} ${sub} ・ ${d.getMonth()+1}/${d.getDate()}</div></div>
+        <div class="rk-score">${sc}</div></div>`}).join('');
   }catch(e){
     el.innerHTML=location.hostname.endsWith('github.io')?'<div class="rank-msg">ランキングを読み込めませんでした。<br>通信状況を確認してください。</div>':
       `<div class="rank-msg">このページではランキングを表示できません。<br><a href="${SITE_URL}" target="_blank" rel="noopener">公開サイト</a>から遊ぶと見られます。</div>`;
