@@ -62,7 +62,8 @@ button:active{transform:scale(.96)}
 .rock-slot canvas{width:100%;height:100%;transition:transform .2s}
 .rock-slot:active canvas{transform:scale(.94)}
 .rk.r2 canvas{filter:drop-shadow(0 0 10px rgba(110,170,255,.65))}
-.rk.r3 canvas{filter:drop-shadow(0 0 14px rgba(255,205,90,.85))}
+.rk.r3 canvas{filter:drop-shadow(0 0 14px rgba(90,230,150,.85))}
+.rk.r3 .spark{background:radial-gradient(circle,#fff 0,#fff 20%,rgba(140,255,180,.9) 35%,rgba(80,220,140,0) 70%)}
 .rk.r4 canvas{animation:glow4 1.1s ease-in-out infinite}
 @keyframes glow4{0%,100%{filter:drop-shadow(0 0 12px rgba(255,120,60,.7))}50%{filter:drop-shadow(0 0 26px rgba(255,200,80,1))}}
 .rk.r4{animation:wobble 2.4s ease-in-out infinite}
@@ -202,6 +203,34 @@ button:active{transform:scale(.96)}
 .asm-after.on{opacity:1;pointer-events:auto}
 .asm-skip{position:absolute;top:14px;left:14px;z-index:3;font-size:13px;font-weight:800;color:var(--sub);padding:8px 14px;border-radius:99px;background:rgba(255,255,255,.07);border:1px solid var(--line)}
 .asm-skip.hide{display:none}
+/* 閉じている演出・ポップアップの中身がタップを横取りしないように */
+.asm-full:not(.on) *,.cmp-full:not(.on) *,.overlay:not(.on) *{pointer-events:none!important}
+/* コンプリート */
+.cmp-full{position:absolute;inset:0;z-index:64;background:radial-gradient(90% 60% at 50% 35%,#3a2a14,#0a0603 75%);opacity:0;pointer-events:none;transition:opacity .5s;overflow-y:auto;overflow-x:hidden}
+.cmp-full.on{opacity:1;pointer-events:auto}
+#cmpFx{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.cmp-inner{position:relative;min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:30px 0 26px}
+.cmp-crown{font-size:46px;opacity:0;transform:translateY(-20px) scale(.5);transition:all .5s cubic-bezier(.3,1.6,.5,1);filter:drop-shadow(0 0 16px rgba(255,210,90,.8))}
+.cmp-crown.on{opacity:1;transform:none}
+.cmp-title{font-family:"Dela Gothic One";font-size:50px;line-height:1.05;text-align:center;background:linear-gradient(180deg,#fffbe8,#ffd86a 45%,#d98f2b);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-stroke:2px #4a2810;filter:drop-shadow(0 5px 0 #2a160a) drop-shadow(0 0 30px rgba(255,200,90,.6));opacity:0;transform:scale(3)}
+.cmp-title.on{animation:titlein .55s cubic-bezier(.3,1.6,.5,1) forwards}
+.cmp-sub{font-weight:800;color:#f2e5cb;font-size:16px;opacity:0;transition:opacity .5s}
+.cmp-sub.on{opacity:1}
+.cmp-parade{width:100%;display:flex;flex-direction:column;gap:6px;overflow:hidden;opacity:0;transition:opacity .8s;margin:6px 0}
+.cmp-parade.on{opacity:1}
+.cmp-track{display:flex;gap:10px;width:max-content;animation:marq 28s linear infinite}
+.cmp-track.rev{animation-direction:reverse;animation-duration:34s}
+.cmp-track img{width:118px;height:91px;object-fit:contain;background:radial-gradient(closest-side,rgba(255,220,150,.16),rgba(0,0,0,0));filter:drop-shadow(0 4px 4px rgba(0,0,0,.6))}
+@keyframes marq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.cmp-stats{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;padding:0 16px;opacity:0;transition:opacity .5s}
+.cmp-stats.on{opacity:1}
+.cmp-stats div{background:rgba(255,220,150,.1);border:1px solid rgba(255,210,120,.35);border-radius:12px;padding:8px 12px;font-size:12px;color:var(--sub);font-weight:800;text-align:center}
+.cmp-stats b{display:block;font-family:"Dela Gothic One";font-weight:400;font-size:20px;color:#ffe08a}
+.cmp-after{display:flex;flex-direction:column;gap:10px;width:100%;padding:0 16px;opacity:0;pointer-events:none;transition:opacity .4s}
+.cmp-after.on{opacity:1;pointer-events:auto}
+.cmp-badge{display:none;font-family:"Dela Gothic One";font-size:14px;letter-spacing:.12em;color:#2b1806;background:linear-gradient(180deg,#ffe9a0,#f0b44c);padding:5px 14px;border-radius:99px;box-shadow:0 0 18px rgba(255,200,90,.6)}
+.cmp-badge.on{display:block}
+.mus-cmp{width:100%;font-weight:800;font-size:15px;padding:12px;border-radius:14px;background:linear-gradient(180deg,#6a4c2a,#4a3420);border:1px solid var(--amber);color:#ffe08a;box-shadow:0 0 16px rgba(240,180,76,.25)}
 /* 結果画面のパーツ枠 */
 .rparts{display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:6px}
 .rparts-row{display:flex;gap:8px}
@@ -278,6 +307,7 @@ button:active{transform:scale(.96)}
         <div class="logo-main"><span class="l1">化石</span><span class="l2">採掘</span></div>
         <svg class="logo-bone" viewBox="0 0 230 26"><defs><linearGradient id="bg1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff6dc"/><stop offset="1" stop-color="#d9b77a"/></linearGradient></defs><g fill="url(#bg1)" stroke="#4a2810" stroke-width="2"><path d="M22 9 H208 a7 7 0 1 1 6 9 a7 7 0 1 1 -6 1 H22 a7 7 0 1 1 -6 -1 a7 7 0 1 1 6 -9z"/></g></svg>
       </div>
+      <div class="cmp-badge" id="cmpBadge">👑 COMPLETE</div>
       <div class="title-progress" id="titleProgress"></div>
       <button class="btn-primary" id="btnStart">はじめる</button>
       <div style="display:flex;gap:10px;width:100%;max-width:300px"><button class="btn-ghost" style="flex:1;padding:12px 6px" onclick="sUI();openDex()">図鑑</button><button class="btn-ghost" style="flex:1;padding:12px 6px" onclick="sUI();openMuseum()">博物館</button><button class="btn-ghost" style="flex:1;padding:12px 6px" onclick="sUI();openRank()">ランキング</button></div>
@@ -349,6 +379,7 @@ button:active{transform:scale(.96)}
       <div class="bar-title">化石博物館</div>
     </div>
     <div class="chip" id="musProgress"></div>
+    <div id="musCmp"></div>
     <div class="museum" id="museum"></div>
   </section>
 
@@ -416,6 +447,21 @@ button:active{transform:scale(.96)}
       </div>
     </div>
   </div>
+  <!-- コンプリート -->
+  <div class="cmp-full" id="complete">
+    <canvas id="cmpFx"></canvas>
+    <div class="cmp-inner">
+      <div class="cmp-crown" id="cmpCrown">👑</div>
+      <div class="cmp-title" id="cmpTitle">図鑑<br>コンプリート!</div>
+      <div class="cmp-sub" id="cmpSub">全20体の全身骨格を発掘した!</div>
+      <div class="cmp-parade" id="cmpParade"><div class="cmp-track" id="cmpTrack1"></div><div class="cmp-track rev" id="cmpTrack2"></div></div>
+      <div class="cmp-stats" id="cmpStats"></div>
+      <div class="cmp-after" id="cmpAfter">
+        <div class="share-row"><button class="btn-img" id="btnCmpShare"><svg viewBox="0 0 24 24" fill="none" stroke="#2b1806" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/></svg>画像で共有</button></div>
+        <button class="btn-primary" id="cmpClose">とじる</button>
+      </div>
+    </div>
+  </div>
   <canvas id="fx"></canvas>
 </div>
 
@@ -432,8 +478,8 @@ const PARTS=['頭','胴','腕','脚'];
 const RAR={
   1:{dur:60,time:135,thick:1.25,hard:1,hint:'ごつごつした<br>ふつうの岩'},
   2:{dur:46,time:120,thick:1.05,hard:2,hint:'うっすら<br>青く光っている'},
-  3:{dur:34,time:100,thick:0.85,hard:3,hint:'金色に<br>光っている…'},
-  4:{dur:24,time:85,thick:0.7,hard:5,hint:'脈打つように<br>光っている!?'}
+  3:{dur:34,time:100,thick:0.85,hard:3,hint:'緑色に<br>光っている…'},
+  4:{dur:24,time:85,thick:0.7,hard:5,hint:'黄金に<br>輝いている!?'}
 };
 // 道具(盤面のマス単位)。dmg=化石に余った力が当たったときのダメージ係数
 const TOOLS={
@@ -544,7 +590,7 @@ function tint(r,g,b,t,shade){
 const FNZ=new Float32Array(4096);for(let i=0;i<4096;i++)FNZ[i]=Math.random()-0.5;
 const LX=-0.5,LY=-0.62,LZ=0.6,LN=Math.hypot(LX,LY,LZ),Lx=LX/LN,Ly=LY/LN,Lz=LZ/LN;
 // 化石だけを立体的に描く(結果・図鑑・タイトル用)
-function renderFossil(dome,size,m,dmgFn){
+function renderFossil(dome,size,m,dmgFn,gold){
   const cv=document.createElement('canvas');cv.width=cv.height=size;const c=cv.getContext('2d');
   const im=c.createImageData(size,size),d=im.data;const K=5*size*(1-2*m)/(384*0.72);
   for(let y=1;y<size-1;y++)for(let x=1;x<size-1;x++){
@@ -553,9 +599,11 @@ function renderFossil(dome,size,m,dmgFn){
     const gx=dome[p+1]-dome[p-1],gy=dome[p+size]-dome[p-size];
     const nx=-gx*K,ny=-gy*K,inv=1/Math.sqrt(nx*nx+ny*ny+1),dl=(nx*Lx+ny*Ly+Lz)*inv,lit=dl>0?dl:0;
     const shade=0.42+0.78*lit,n=FNZ[(y*131+x*71)&4095]*14;
-    let r=(238-n)*shade,g=(226-n)*shade,b=(198-n)*shade;
+    let r,g,b,sp;
+    if(gold){const sh2=0.3+0.95*lit;r=(236-n)*sh2;g=(178-n)*sh2;b=(62-n*0.5)*sh2;sp=Math.pow(lit,9)*190;const sp2=Math.pow(lit,40)*120;r+=sp+sp2;g+=sp*0.86+sp2;b+=sp*0.45+sp2}
+    else{r=(238-n)*shade;g=(226-n)*shade;b=(198-n)*shade;sp=Math.pow(lit,14)*110;r+=sp;g+=sp;b+=sp}
     if(dmgFn){const t=dmgFn(x,y);if(t>0)[r,g,b]=tint(r,g,b,t,shade)}
-    const sp=Math.pow(lit,14)*110;d[o]=r+sp;d[o+1]=g+sp;d[o+2]=b+sp;d[o+3]=255;
+    d[o]=r;d[o+1]=g;d[o+2]=b;d[o+3]=255;
   }
   c.putImageData(im,0,0);return cv;
 }
@@ -646,7 +694,7 @@ let CUR='title';
 function show(id){CUR=id;if(id!=='result'&&!document.getElementById('assembly').classList.contains('on')){FX=[];fxx.clearRect(0,0,fxc.width,fxc.height)}document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('active',s.id==='s-'+id))}
 function progressCounts(){let parts=0,done=0;for(const k in dexData){const c=Object.keys(dexData[k].parts||{}).length;parts+=c;if(c===4)done++}return{parts,done}}
 function progressText(){const {parts,done}=progressCounts();return `集めたパーツ ${parts}/80 ・ 完成 ${done}/20体`}
-function toTitle(){document.getElementById('titleProgress').textContent=progressText();show('title')}
+function toTitle(){document.getElementById('titleProgress').textContent=progressText();document.getElementById('cmpBadge').classList.toggle('on',progressCounts().done===20);show('title')}
 function showHowto(){document.getElementById('howto').classList.add('on')}
 function hideHowto(){document.getElementById('howto').classList.remove('on');settings.seen=true;saveSet()}
 document.getElementById('btnStart').onclick=()=>{audioInit();sUI();toSelect();if(!settings.seen)setTimeout(showHowto,350)};
@@ -699,7 +747,7 @@ function drawTitle(t,dt){
 }
 
 // ================= 岩選び =================
-function renderRockThumb(seed,size){
+function renderRockThumb(seed,size,gold){
   const rng=mulberry32(seed),cv=document.createElement('canvas');cv.width=cv.height=size;const c=cv.getContext('2d');
   const n1=lattice(size,size,size/5,size/5,rng),n2=lattice(size,size,size/14,size/14,rng),n3=lattice(size,size,3,3,rng);
   const ph=[rng()*6,rng()*6,rng()*6],R0=size*0.36,h=new Float32Array(size*size);
@@ -711,7 +759,9 @@ function renderRockThumb(seed,size){
     const gx=(h[p+1]-h[p-1])+(n3[p+1]-n3[p-1])*1.2,gy=(h[p+size]-h[p-size])+(n3[p+size]-n3[p-size])*1.2;
     const nx=-gx*0.5,ny=-gy*0.5,inv=1/Math.sqrt(nx*nx+ny*ny+1),dl=(nx*Lx+ny*Ly+Lz)*inv,lit=dl>0?dl:0,shade=0.32+0.85*lit;
     const sm=Math.min(1,Math.max(0,(n1[p]-0.42)/0.16)),v=(n3[p]-0.5)*40;
-    const k=sm*0.55;let r=126+46*k+v,g=115+14*k+v*0.9,b=106-20*k+v*0.8;
+    const k=sm*0.55;let r,g,b;
+    if(gold){r=176+40*k+v;g=134+30*k+v*0.85;b=58+10*k+v*0.4;const gl=(n3[p]>0.8?Math.pow(lit,3)*230:0)+Math.pow(lit,10)*120;r+=gl;g+=gl*0.88;b+=gl*0.45}
+    else{r=126+46*k+v;g=115+14*k+v*0.9;b=106-20*k+v*0.8}
     const edge=Math.min(1,h[p]/(size*0.03));
     dd[p*4]=r*shade;dd[p*4+1]=g*shade;dd[p*4+2]=b*shade;dd[p*4+3]=255*Math.min(1,edge*3);}
   const t=document.createElement('canvas');t.width=t.height=size;const tc=t.getContext('2d');tc.putImageData(im,0,0);
@@ -727,7 +777,7 @@ function toSelect(){
   const el=document.getElementById('rocks');el.innerHTML='';choosing=false;
   rockChoices.forEach((rk,idx)=>{
     const s=document.createElement('div');s.className='rock-slot';
-    const box=document.createElement('div');box.className='rk r'+rk.r;box.appendChild(renderRockThumb(rk.seed,220));
+    const box=document.createElement('div');box.className='rk r'+rk.r;box.appendChild(renderRockThumb(rk.seed,220,rk.r===4));
     const ns=rk.r===1?0:rk.r===2?3:rk.r===3?6:10;
     for(let k=0;k<ns;k++){const sp=document.createElement('i');sp.className='spark';sp.style.left=(10+rnd()*75)+'%';sp.style.top=(10+rnd()*65)+'%';sp.style.animationDelay=(rnd()*1.6)+'s';const sz=5+rnd()*7;sp.style.width=sp.style.height=sz+'px';box.appendChild(sp)}
     s.appendChild(box);const tg=document.createElement('div');tg.className='tag';tg.innerHTML=RAR[rk.r].hint;s.appendChild(tg);
@@ -812,7 +862,7 @@ function startClean(rock){
   // 化石マスク(光の演出用)
   const mk=document.createElement('canvas');mk.width=mk.height=D;const mc=mk.getContext('2d'),mi=mc.createImageData(D,D);
   for(let p=0;p<ND;p++)if(domeHi[p]>0){mi.data[p*4]=mi.data[p*4+1]=mi.data[p*4+2]=255;mi.data[p*4+3]=255}mc.putImageData(mi,0,0);
-  G={rock,R,shape,domeHi,soil,rockL,hard,hardInit,cov,cellDmg,fossil,fossilIdx,fossilCount:fossilIdx.length,inRock,jit,chunk,cStart,cList,seeds,
+  G={gold:rock.r===4,rock,R,shape,domeHi,soil,rockL,hard,hardInit,cov,cellDmg,fossil,fossilIdx,fossilCount:fossilIdx.length,inRock,jit,chunk,cStart,cList,seeds,
      PEB,PBX,PBY,cracks,mask:mk,totalDmg:0,time:R.time,tool:G?G.tool:'h2',down:false,px:-99,py:-99,ax:-99,ay:-99,lx:null,ly:null,touch:false,over:false,seq:null,seqT:0,
      parts:[],flashes:[],trauma:0,freeze:0,lastHammer:0,hudT:0,exp:0,ms:0,revealed:false,dirty:null,lastSec:99,crackT:0,dark:0,sweep:-1};
   document.querySelectorAll('.tool').forEach(b=>b.classList.toggle('sel',b.dataset.tool===G.tool));
@@ -834,7 +884,7 @@ function renderRect(x0,y0,x1,y1){
     for(let x=ax0;x<ax1;x++){const i0=BI0[x],i1=BI1[x],fx=BF[x];
       const c=(cov[r0+i0]+(cov[r0+i1]-cov[r0+i0])*fx)*(1-fy)+(cov[r1+i0]+(cov[r1+i1]-cov[r1+i0])*fx)*fy;
       const p=y*D+x;COV[p]=c;SURF[p]=c+dome[p]}}
-  const d=img.data,{DN,DNX,DNY,STR,SPK,SP,JX,JY}=TX,PEB=G.PEB,PBX=G.PBX,PBY=G.PBY,soil=G.soil,rockL=G.rockL,hard=G.hard,dmg=G.cellDmg;
+  const GOLD=G.gold,d=img.data,{DN,DNX,DNY,STR,SPK,SP,JX,JY}=TX,PEB=G.PEB,PBX=G.PBX,PBY=G.PBY,soil=G.soil,rockL=G.rockL,hard=G.hard,dmg=G.cellDmg;
   for(let y=y0;y<y1;y++){
     const r0=BI0[y]*SIM,r1=BI1[y]*SIM,fy=BF[y];
     for(let x=x0;x<x1;x++){
@@ -850,16 +900,21 @@ function renderRect(x0,y0,x1,y1){
       let shade=0.38+0.8*lit;
       if(y>=SHY&&x>=SHX){let sh=(SURF[p-SHY*D-SHX]-SURF[p]-0.12)*0.65;if(sh>0){if(sh>0.6)sh=0.6;shade*=1-sh}}
       const dn=DN[p];let r,g,b;
-      if(mat===0){const v=dn*75+SPK[p]*13;r=174+v;g=129+v*0.85;b=86+v*0.6}
+      if(GOLD){
+        if(mat===0){const v=dn*70+SPK[p]*14;r=192+v;g=158+v*0.85;b=96+v*0.5;if(SP[p]){const gl=Math.pow(lit,4)*200;r+=gl;g+=gl*0.9;b+=gl*0.5}}
+        else if(mat===1){const st=STR[p]*20,pe=PEB[p]*40;r=152+st+pe+dn*34;g=124+st*0.9+pe*0.85+dn*30;b=78+st*0.6+pe*0.5+dn*20;if(SP[p]||SPK[p]>0.93){const gl=Math.pow(lit,4)*220;r+=gl;g+=gl*0.88;b+=gl*0.45}}
+        else if(mat===2){r=78+dn*30;g=62+dn*26;b=40+dn*20;if(SP[p]||SPK[p]>0.9){const gl=Math.pow(lit,3)*240;r+=gl;g+=gl*0.82;b+=gl*0.3}}
+        else if(mat===3){r=236+dn*14;g=180+dn*14;b=64+dn*10}}
+      else if(mat===0){const v=dn*75+SPK[p]*13;r=174+v;g=129+v*0.85;b=86+v*0.6}
       else if(mat===1){const st=STR[p]*18,pe=PEB[p]*36;r=124+st+pe+dn*32;g=113+st+pe+dn*30;b=104+st*0.9+pe+dn*28}
       else if(mat===2){r=64+dn*34;g=68+dn*34;b=86+dn*38;if(SP[p]){const gl=Math.pow(lit,5)*230;r+=gl;g+=gl;b+=gl*1.1}}
       else if(mat===3){r=238+dn*20;g=226+dn*20;b=198+dn*18}
       else{const w=((x+y)&3)===0?-5:0;r=40+dn*16+w;g=45+dn*16+w;b=47+dn*16+w}
       r*=shade;g*=shade;b*=shade;
-      if(mat===3){const sp=Math.pow(lit,14)*120;r+=sp;g+=sp;b+=sp;
+      if(mat===3){if(GOLD){const sp=Math.pow(lit,9)*200,s2=Math.pow(lit,40)*130;r+=sp+s2;g+=sp*0.86+s2;b+=sp*0.45+s2}else{const sp=Math.pow(lit,14)*120;r+=sp;g+=sp;b+=sp}
         const i0=BI0[x],i1=BI1[x],fx=BF[x];const t0=(dmg[r0+i0]+(dmg[r0+i1]-dmg[r0+i0])*fx)*(1-fy)+(dmg[r1+i0]+(dmg[r1+i1]-dmg[r1+i0])*fx)*fy;
         if(t0>0.002){const t=t0>=DMGFULL?1:t0/DMGFULL;[r,g,b]=tint(r,g,b,t,shade)}}
-      else if(mat<3&&c<0.55&&dome[p]>0){const t=(1-c/0.55)*0.5;r+=(225*shade-r)*t;g+=(214*shade-g)*t;b+=(188*shade-b)*t}
+      else if(mat<3&&c<0.55&&dome[p]>0){const t=(1-c/0.55)*0.5,fc=GOLD?[240,190,80]:[225,214,188];r+=(fc[0]*shade-r)*t;g+=(fc[1]*shade-g)*t;b+=(fc[2]*shade-b)*t}
       const o=p*4;d[o]=r;d[o+1]=g;d[o+2]=b;d[o+3]=255;
     }}
   octx.putImageData(img,0,0,x0,y0,x1-x0,y1-y0);
@@ -914,13 +969,14 @@ function drillAt(gx,gy,dt){
 }
 
 // ---- 演出パーツ ----
+const MCG={soil:[[214,170,80],[176,134,60],[240,206,120]],rock:[[176,134,62],[140,104,48],[220,180,96]],hard:[[90,72,44],[66,52,34],[200,160,70]],fossil:[[240,196,90],[214,160,60],[200,130,235]]};
 const MC={soil:[[184,138,92],[150,108,70],[205,165,115]],rock:[[130,118,108],[100,90,82],[160,148,135]],hard:[[70,74,92],[52,55,70],[110,115,135]],fossil:[[238,226,198],[210,195,165],[200,130,235]]};
 function shardPoly(){const n=4+(rnd()*3|0),pts=[];for(let k=0;k<n;k++){const a=k/n*Math.PI*2+rnd()*0.6,r=0.6+rnd()*0.5;pts.push([Math.cos(a)*r,Math.sin(a)*r])}return pts}
-function spawnShards(x,y,m,n,big){for(let k=0;k<n;k++){const a=rnd()*Math.PI*2,sp=(60+rnd()*180)*big;const c=MC[m][rnd()*3|0];
+function spawnShards(x,y,m,n,big){const P=G&&G.gold?MCG:MC;for(let k=0;k<n;k++){const a=rnd()*Math.PI*2,sp=(60+rnd()*180)*big;const c=P[m][rnd()*3|0];
   G.parts.push({k:'sh',x:x+(rnd()-0.5)*14,y:y+(rnd()-0.5)*14,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-120*big,rot:rnd()*6,vr:(rnd()-0.5)*14,s:(2.5+rnd()*4.5)*big,life:0.7+rnd()*0.4,max:1.1,c,poly:shardPoly()})}}
-function spawnGrit(x,y,m,n){for(let k=0;k<n;k++){const a=rnd()*Math.PI*2,sp=40+rnd()*120,c=MC[m][rnd()*3|0];
+function spawnGrit(x,y,m,n){const P=G&&G.gold?MCG:MC;for(let k=0;k<n;k++){const a=rnd()*Math.PI*2,sp=40+rnd()*120,c=P[m][rnd()*3|0];
   G.parts.push({k:'gr',x:x+(rnd()-0.5)*8,y:y+(rnd()-0.5)*8,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-50,s:1+rnd()*1.8,life:0.35+rnd()*0.3,max:0.65,c})}}
-function spawnDust(x,y,m,n){for(let k=0;k<n;k++){const c=MC[m][2];G.parts.push({k:'du',x:x+(rnd()-0.5)*20,y:y+(rnd()-0.5)*20,vx:(rnd()-0.5)*40,vy:-10-rnd()*25,s:6+rnd()*6,g:18+rnd()*14,life:0.6+rnd()*0.5,max:1.1,c})}}
+function spawnDust(x,y,m,n){const P=G&&G.gold?MCG:MC;for(let k=0;k<n;k++){const c=P[m][2];G.parts.push({k:'du',x:x+(rnd()-0.5)*20,y:y+(rnd()-0.5)*20,vx:(rnd()-0.5)*40,vy:-10-rnd()*25,s:6+rnd()*6,g:18+rnd()*14,life:0.6+rnd()*0.5,max:1.1,c})}}
 function spawnSpark(x,y,n,col){for(let k=0;k<n;k++){const a=rnd()*Math.PI*2,sp=150+rnd()*260;G.parts.push({k:'sp',x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:0.18+rnd()*0.2,max:0.4,c:col||(rnd()<0.6?[205,140,255]:[255,240,255])})}}
 function spawnTwinkle(x,y,n,spread){for(let k=0;k<n;k++)G.parts.push({k:'tw',x:x+(rnd()-0.5)*spread,y:y+(rnd()-0.5)*spread,vx:0,vy:-12,s:4+rnd()*6,life:0.5+rnd()*0.6,max:1.1,ph:rnd()*6})}
 function addFlash(x,y,r,col,life){G.flashes.push({x,y,r,col,life,max:life})}
@@ -1073,7 +1129,7 @@ function showResultInner(){
   stamp.className='stamp';badge.innerHTML='';document.getElementById('rParts').innerHTML='';RES=null;SHARE=null;document.getElementById('rRankSlot').innerHTML='';document.getElementById('rShareSlot').innerHTML='';document.getElementById('rScore').textContent='0';
   // 化石の絵
   const dm=G.cellDmg;const fc=renderFossil(G.domeHi,D,FMARGIN,(x,y)=>{const r0=BI0[y]*SIM,r1=BI1[y]*SIM,i0=BI0[x],i1=BI1[x],fx=BF[x],fy=BF[y];
-    const t=(dm[r0+i0]+(dm[r0+i1]-dm[r0+i0])*fx)*(1-fy)+(dm[r1+i0]+(dm[r1+i1]-dm[r1+i0])*fx)*fy;return t>0.002?Math.min(1,t/DMGFULL):0});
+    const t=(dm[r0+i0]+(dm[r0+i1]-dm[r0+i0])*fx)*(1-fy)+(dm[r1+i0]+(dm[r1+i1]-dm[r1+i0])*fx)*fy;return t>0.002?Math.min(1,t/DMGFULL):0},G.gold);
   let bx0=D,by0=D,bx1=0,by1=0;for(let y=0;y<D;y++)for(let x=0;x<D;x++)if(G.domeHi[y*D+x]>0){if(x<bx0)bx0=x;if(x>bx1)bx1=x;if(y<by0)by0=y;if(y>by1)by1=y}
   const rc=document.getElementById('resultCanvas');show('result');
   const dpr=Math.min(2,devicePixelRatio||1);rc.width=rc.clientWidth*dpr;rc.height=rc.clientHeight*dpr;const c2=rc.getContext('2d');
@@ -1105,7 +1161,7 @@ function showResultInner(){
 
 // ================= 全身骨格 =================
 const thumbCache={};
-function partCanvas(sp,part,size){const sh=makeShape(sp,part,RAR[SPECIES[sp].r].thick);return renderFossil(rasterDome(sh,size,0.05),size,0.05)}
+function partCanvas(sp,part,size){const sh=makeShape(sp,part,RAR[SPECIES[sp].r].thick);return renderFossil(rasterDome(sh,size,0.05),size,0.05,null,SPECIES[sp].r===4)}
 function thumbURL(sp,part){const k=sp+'-'+part;if(!thumbCache[k])thumbCache[k]=partCanvas(sp,part,96).toDataURL();return thumbCache[k]}
 // 結果画面:その恐竜の4パーツ枠(新しいパーツがはまる)
 function partSlots(sp,newPart,completed){
@@ -1159,6 +1215,7 @@ function showAssembly(sp,opt){
   asmLater(tA+2500,()=>{document.getElementById('asmName').classList.add('on');cEl.classList.add('on');
     if(fresh)asmLater(450,()=>{const b=document.getElementById('asmNum');b.textContent=done;b.classList.add('pop');sDing(2)})});
   asmLater(tA+3200,asmFinishUI);
+  if(fresh&&done===20)asmLater(tA+4600,()=>showComplete());
   asmPrepShare(sp,done);
 }
 function asmFinishUI(){document.getElementById('asmAfter').classList.add('on');document.getElementById('asmSkip').classList.add('hide')}
@@ -1197,8 +1254,76 @@ function asmPrepShare(sp,done){
   const tok=ASM;makeAsmImage(sp,avg,done).then(cv=>{if(ASM!==tok)return;ASM.url=cv.toDataURL('image/png');cv.toBlob(b=>{if(ASM===tok)ASM.blob=b},'image/png')}).catch(reportErr);
 }
 
+// ================= コンプリート演出 =================
+let CMT=[],CFX={on:false,parts:[],next:0},CMP=null;
+function cmpLater(ms,fn){CMT.push(setTimeout(()=>{try{fn()}catch(e){reportErr(e)}},ms))}
+function sBoom(){nz({f:500,f2:80,dur:0.9,g:0.7});tn({f:70,f2:35,dur:0.6,g:0.5});for(let i=0;i<7;i++)nz({type:'highpass',f:3000+rnd()*3000,dur:0.03,g:0.12,at:0.25+i*0.06+rnd()*0.05})}
+function firework(x,y,big){const cols=[[255,215,110],[255,240,200],[255,150,90],[150,210,255],[230,160,255],[150,240,170]],c=cols[rnd()*cols.length|0],n=big?90:60,k=(document.getElementById('cmpFx').width/430);
+  for(let i=0;i<n;i++){const a=i/n*Math.PI*2+rnd()*0.1,sp=(120+rnd()*(big?260:180))*k;CFX.parts.push({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:1.1+rnd()*0.7,max:1.8,c:rnd()<0.2?[255,255,255]:c,k})}
+  sBoom()}
+function drawCmpFx(dt){
+  const cv=document.getElementById('cmpFx'),x=cv.getContext('2d');x.clearRect(0,0,cv.width,cv.height);
+  CFX.next-=dt;if(CFX.auto&&CFX.next<=0){CFX.next=0.7+rnd()*0.9;firework(cv.width*(0.15+rnd()*0.7),cv.height*(0.1+rnd()*0.35),rnd()<0.3)}
+  x.globalCompositeOperation='lighter';
+  for(const p of CFX.parts){p.life-=dt;p.vx*=0.985;p.vy=p.vy*0.985+90*p.k*dt;const ox=p.x,oy=p.y;p.x+=p.vx*dt;p.y+=p.vy*dt;const a=Math.max(0,Math.min(1,p.life/0.8));
+    x.strokeStyle=`rgba(${p.c[0]},${p.c[1]},${p.c[2]},${a})`;x.lineWidth=2.2*p.k;x.beginPath();x.moveTo(ox-(p.vx*0.03),oy-(p.vy*0.03));x.lineTo(p.x,p.y);x.stroke()}
+  x.globalCompositeOperation='source-over';CFX.parts=CFX.parts.filter(p=>p.life>0);
+}
+function cmpStats(){
+  let sum=0,n=0,gold=0;for(let i=0;i<20;i++){const rec=(dexData[i]&&dexData[i].parts)||{};for(const k in rec){sum+=rec[k];n++;if(SPECIES[i].r===4)gold++}}
+  return {avg:n?Math.round(sum/n):0,parts:n,gold};
+}
+function showComplete(){
+  CMT.forEach(clearTimeout);CMT=[];
+  const el=document.getElementById('complete');['cmpCrown','cmpTitle','cmpSub','cmpParade','cmpStats','cmpAfter'].forEach(id=>document.getElementById(id).classList.remove('on'));
+  el.scrollTop=0;el.classList.add('on');
+  const fx=document.getElementById('cmpFx'),ar=document.getElementById('app').getBoundingClientRect(),dpr=Math.min(2,devicePixelRatio||1);fx.width=ar.width*dpr;fx.height=ar.height*dpr;
+  CFX={on:true,parts:[],next:0,auto:false};
+  // 骨格パレード(2列、つなぎ目が見えないように2周分並べる)
+  const ids=[...Array(20).keys()],a=ids.slice(0,10),b=ids.slice(10);
+  const row=list=>[...list,...list].map(i=>`<img src="${compositeURL(i,[0,1,2,3])}" alt="">`).join('');
+  document.getElementById('cmpTrack1').innerHTML=row(a);document.getElementById('cmpTrack2').innerHTML=row(b);
+  const st=cmpStats();
+  document.getElementById('cmpStats').innerHTML=`<div><b>20/20</b>全身骨格</div><div><b>${st.parts}/80</b>パーツ</div><div><b>${st.avg}点</b>全パーツ平均</div><div><b>${st.gold}/8</b>黄金の骨</div>`;
+  sDrum(1.6);
+  cmpLater(1700,()=>{document.getElementById('cmpTitle').classList.add('on');sStamp();buzz([60,40,140]);firework(fx.width*0.5,fx.height*0.28,true);
+    cmpLater(250,()=>firework(fx.width*0.25,fx.height*0.2,false));cmpLater(450,()=>firework(fx.width*0.75,fx.height*0.22,false));
+    confetti(220);sFanfare(true);cmpLater(700,()=>{[523.3,659.3,784,1046.5,1318.5].forEach((f,i)=>tn({f,dur:2.2,g:0.07,at:i*0.02,type:'triangle'}))})});
+  cmpLater(2100,()=>document.getElementById('cmpCrown').classList.add('on'));
+  cmpLater(2500,()=>document.getElementById('cmpSub').classList.add('on'));
+  cmpLater(3000,()=>{document.getElementById('cmpParade').classList.add('on');CFX.auto=true});
+  cmpLater(3600,()=>document.getElementById('cmpStats').classList.add('on'));
+  cmpLater(4200,()=>document.getElementById('cmpAfter').classList.add('on'));
+  // 共有の準備
+  CMP={text:`化石採掘で恐竜図鑑をコンプリート!👑\n全20体の全身骨格を発掘 ・ 全パーツ平均${st.avg}点\n#化石採掘`,blob:null,url:null};const tok=CMP;
+  makeCmpImage(st).then(cv=>{if(CMP!==tok)return;CMP.url=cv.toDataURL('image/png');cv.toBlob(b=>{if(CMP===tok)CMP.blob=b},'image/png')}).catch(reportErr);
+  settings.cmpSeen=true;saveSet();
+}
+document.getElementById('cmpClose').onclick=()=>{sUI();CMT.forEach(clearTimeout);CMT=[];document.getElementById('complete').classList.remove('on');setTimeout(()=>{CFX.on=false},500);
+  document.getElementById('cmpBadge').classList.toggle('on',progressCounts().done===20)};
+document.getElementById('btnCmpShare').onclick=()=>{sUI();if(CMP)shareWith(CMP)};
+async function makeCmpImage(st){
+  try{if(document.fonts){await Promise.race([Promise.all([document.fonts.load('40px "Dela Gothic One"','図鑑コンプリート化石採掘'),document.fonts.load('700 30px "M PLUS Rounded 1c"','全パーツ平均')]),new Promise(r=>setTimeout(r,1500))])}}catch(e){}
+  const W=1200,H=675,cv=document.createElement('canvas');cv.width=W;cv.height=H;const c=cv.getContext('2d');
+  const DELA='"Dela Gothic One","Hiragino Sans",sans-serif',MPR='"M PLUS Rounded 1c","Hiragino Sans",sans-serif';
+  let g=c.createRadialGradient(W/2,H*0.3,40,W/2,H*0.4,W*0.7);g.addColorStop(0,'#4a3418');g.addColorStop(1,'#0c0805');c.fillStyle=g;c.fillRect(0,0,W,H);
+  c.save();c.translate(W/2,H*0.32);for(let i=0;i<18;i++){c.rotate(Math.PI*2/18);const gg=c.createLinearGradient(0,0,W,0);gg.addColorStop(0,'rgba(255,215,120,.16)');gg.addColorStop(1,'rgba(255,215,120,0)');c.fillStyle=gg;c.beginPath();c.moveTo(0,0);c.lineTo(W,-70);c.lineTo(W,70);c.closePath();c.fill()}c.restore();
+  c.textAlign='center';c.textBaseline='alphabetic';
+  c.font=`30px ${DELA}`;c.fillStyle='#e8c070';c.fillText('化石採掘',W/2,62);
+  c.font=`64px ${DELA}`;g=c.createLinearGradient(0,80,0,150);g.addColorStop(0,'#fffbe8');g.addColorStop(1,'#e59a2e');c.lineWidth=6;c.strokeStyle='#4a2810';c.strokeText('👑 図鑑コンプリート!',W/2,140);c.fillStyle=g;c.fillText('👑 図鑑コンプリート!',W/2,140);
+  // 5×4 の骨格
+  const cw=210,ch=105,gx=(W-cw*5)/2,gy=168;c.shadowColor='rgba(0,0,0,.6)';c.shadowBlur=8;c.shadowOffsetY=3;
+  for(let i=0;i<20;i++){const col=i%5,rw=i/5|0,cc=compCanvas(i,240);const sc=Math.min(cw/cc.width,ch/cc.height)*0.95;c.drawImage(cc,gx+col*cw+(cw-cc.width*sc)/2,gy+rw*ch+(ch-cc.height*sc)/2,cc.width*sc,cc.height*sc)}
+  c.shadowColor='transparent';
+  c.font=`800 28px ${MPR}`;c.fillStyle='#ffe08a';c.fillText(`全20体 ・ 全パーツ平均 ${st.avg}点 ・ 黄金の骨 ${st.gold}/8`,W/2,620);
+  c.font=`700 20px ${MPR}`;c.fillStyle='#9a8a76';c.fillText('#化石採掘  pani1208.github.io/kaseki-saikutsu',W/2,655);
+  return cv;
+}
+
 // ================= 博物館 =================
 const compCache={};
+function compCanvas(sp,W){const H=Math.round(W/1.3),cv=document.createElement('canvas');cv.width=W;cv.height=H;const c=cv.getContext('2d');
+  for(const [part,x,y,sz] of ASM_LAY){const pc=partCanvas(sp,part,Math.min(256,Math.round(W*0.45))),z=W*sz;c.drawImage(pc,x*W-z/2,y*H-z/2,z,z)}return cv}
 function compositeURL(sp,owned){
   // owned: 持っているパーツ番号の配列。持っていないパーツは黒いシルエットで描く
   const k=sp+':'+owned.join('');if(compCache[k])return compCache[k];
@@ -1215,6 +1340,7 @@ function musToast(t){const d=document.createElement('div');d.className='mus-toas
 function openMuseum(){
   musFrom=CUR==='museum'?musFrom:CUR;const {done}=progressCounts();
   document.getElementById('musProgress').textContent=`展示中 ${done}/20体`;
+  document.getElementById('musCmp').innerHTML=done===20?'<button class="mus-cmp" onclick="sUI();showComplete()">👑 コンプリート記念を見る</button>':'';
   const el=document.getElementById('museum');el.innerHTML='';const job=++musJob,todo=[];
   SPECIES.forEach((sp,i)=>{const rec=(dexData[i]&&dexData[i].parts)||{},got=Object.keys(rec).length,full=got===4;
     const avg=full?Math.round(PARTS.reduce((a,_,k)=>a+rec[k],0)/4):0;
@@ -1468,10 +1594,12 @@ function loopBody(now){
     try{drawBoard(dt)}catch(e){reportErr(e)}
   }
   if(AFX.on){try{drawAsmFx(dt)}catch(e){reportErr(e)}}
+  if(CFX.on){try{drawCmpFx(dt)}catch(e){reportErr(e)}}
   try{drawFx(dt)}catch(e){FX=[];reportErr(e)}
 }
 drawSndBtn();
 document.getElementById('titleProgress').textContent=progressText();
+document.getElementById('cmpBadge').classList.toggle('on',progressCounts().done===20);
 (document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(()=>{});
 requestAnimationFrame(()=>{drawTitleBg();requestAnimationFrame(loop)});
 </script>
