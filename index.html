@@ -105,9 +105,9 @@ button:active{transform:scale(.96)}
 .ftxt{position:absolute;transform:translate(-50%,-50%);font-family:"Dela Gothic One";font-size:20px;color:#fff;white-space:nowrap;text-shadow:0 2px 0 rgba(0,0,0,.7),0 0 12px rgba(255,210,120,.8);animation:fup 1.1s ease-out forwards}
 .ftxt.purple{color:#e7c6ff;text-shadow:0 2px 0 rgba(0,0,0,.7),0 0 12px rgba(180,100,240,.9);font-size:17px}
 @keyframes fup{0%{opacity:0;transform:translate(-50%,-30%) scale(.6)}15%{opacity:1;transform:translate(-50%,-50%) scale(1.15)}30%{transform:translate(-50%,-55%) scale(1)}100%{opacity:0;transform:translate(-50%,-120%)}}
-.tools{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-.tool{position:relative;display:flex;flex-direction:column;align-items:center;gap:5px;padding:14px 4px 11px;border-radius:14px;background:linear-gradient(180deg,#2f261f,#231b16);border:1px solid var(--line);font-size:12px;font-weight:700;color:var(--sub);transition:all .15s}
-.tool svg{width:40px;height:40px}
+.tools{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.tool{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px 8px;border-radius:14px;background:linear-gradient(180deg,#2f261f,#231b16);border:1px solid var(--line);font-size:12px;font-weight:700;color:var(--sub);transition:all .15s}
+.tool svg{width:34px;height:34px}
 .tool.sel{background:linear-gradient(180deg,#5a4126,#3a2a1b);border-color:var(--amber);color:var(--cream);box-shadow:0 0 0 1px var(--amber),0 6px 18px rgba(240,170,70,.25);transform:translateY(-2px)}
 .pw{display:flex;gap:3px}
 .pw i{width:7px;height:4px;border-radius:2px;background:#4b3d30}
@@ -216,10 +216,12 @@ button:active{transform:scale(.96)}
     </div>
     <div class="board-wrap" id="boardWrap"><canvas id="board"></canvas><div class="board-frame"></div><div class="float-layer" id="floatLayer"></div></div>
     <div class="tools">
-      <button class="tool sel" data-tool="hammer"><svg viewBox="0 0 40 40"><path d="M21 17 L33 33" stroke="#8a5a32" stroke-width="5" stroke-linecap="round"/><path d="M21 17 L33 33" stroke="#b37a45" stroke-width="2" stroke-linecap="round"/><rect x="6" y="7" width="22" height="11" rx="2.5" transform="rotate(38 17 12.5)" fill="#9aa3ab" stroke="#3b4248" stroke-width="1.6"/><rect x="7" y="8.5" width="20" height="3" rx="1.5" transform="rotate(38 17 12.5)" fill="#d6dde2"/></svg>ハンマー<div class="pw" style="visibility:hidden"><i></i></div></button>
-      <button class="tool" data-tool="d1"><svg viewBox="0 0 40 40"><rect x="5" y="14" width="17" height="12" rx="4" fill="#c4502f" stroke="#5a2414" stroke-width="1.6"/><rect x="21" y="16.5" width="6" height="7" fill="#7d858c" stroke="#3b4248" stroke-width="1.4"/><path d="M27 18 L37 20 L27 22z" fill="#c9d0d6" stroke="#3b4248" stroke-width="1.2"/><path d="M8 26 L10 34 H16 L15 26" fill="#8f3a22"/></svg>ドリル<div class="pw"><i class="on"></i><i></i><i></i></div></button>
-      <button class="tool" data-tool="d2"><svg viewBox="0 0 40 40"><rect x="5" y="14" width="17" height="12" rx="4" fill="#c4502f" stroke="#5a2414" stroke-width="1.6"/><rect x="21" y="16" width="6" height="8" fill="#7d858c" stroke="#3b4248" stroke-width="1.4"/><path d="M27 16.5 L37 20 L27 23.5z" fill="#c9d0d6" stroke="#3b4248" stroke-width="1.2"/><path d="M8 26 L10 34 H16 L15 26" fill="#8f3a22"/></svg>ドリル<div class="pw"><i class="on"></i><i class="on"></i><i></i></div></button>
-      <button class="tool" data-tool="d3"><svg viewBox="0 0 40 40"><rect x="4" y="13" width="18" height="14" rx="4" fill="#c4502f" stroke="#5a2414" stroke-width="1.6"/><rect x="21" y="15" width="6" height="10" fill="#7d858c" stroke="#3b4248" stroke-width="1.4"/><path d="M27 15 L38 20 L27 25z" fill="#c9d0d6" stroke="#3b4248" stroke-width="1.2"/><path d="M29 17 L33 23 M31 16.5 L35 22" stroke="#7d858c" stroke-width="1"/><path d="M7 27 L9 35 H16 L15 27" fill="#8f3a22"/></svg>ドリル<div class="pw"><i class="on"></i><i class="on"></i><i class="on"></i></div></button>
+      <button class="tool" data-tool="h1"><svg viewBox="0 0 40 40"><g transform="translate(20 20) scale(0.72) translate(-20 -20)"><path d="M21 17 L33 33" stroke="#8a5a32" stroke-width="5" stroke-linecap="round"/><path d="M21 17 L33 33" stroke="#b37a45" stroke-width="2" stroke-linecap="round"/><rect x="6" y="7" width="22" height="11" rx="2.5" transform="rotate(38 17 12.5)" fill="#9aa3ab" stroke="#3b4248" stroke-width="1.6"/><rect x="7" y="8.5" width="20" height="3" rx="1.5" transform="rotate(38 17 12.5)" fill="#d6dde2"/></g></svg>ハンマー小<div class="pw"><i class="on"></i><i></i><i></i></div></button>
+      <button class="tool sel" data-tool="h2"><svg viewBox="0 0 40 40"><g transform="translate(20 20) scale(0.86) translate(-20 -20)"><path d="M21 17 L33 33" stroke="#8a5a32" stroke-width="5" stroke-linecap="round"/><path d="M21 17 L33 33" stroke="#b37a45" stroke-width="2" stroke-linecap="round"/><rect x="6" y="7" width="22" height="11" rx="2.5" transform="rotate(38 17 12.5)" fill="#9aa3ab" stroke="#3b4248" stroke-width="1.6"/><rect x="7" y="8.5" width="20" height="3" rx="1.5" transform="rotate(38 17 12.5)" fill="#d6dde2"/></g></svg>ハンマー中<div class="pw"><i class="on"></i><i class="on"></i><i></i></div></button>
+      <button class="tool" data-tool="h3"><svg viewBox="0 0 40 40"><g transform="translate(20 20) scale(1.0) translate(-20 -20)"><path d="M21 17 L33 33" stroke="#8a5a32" stroke-width="5" stroke-linecap="round"/><path d="M21 17 L33 33" stroke="#b37a45" stroke-width="2" stroke-linecap="round"/><rect x="6" y="7" width="22" height="11" rx="2.5" transform="rotate(38 17 12.5)" fill="#9aa3ab" stroke="#3b4248" stroke-width="1.6"/><rect x="7" y="8.5" width="20" height="3" rx="1.5" transform="rotate(38 17 12.5)" fill="#d6dde2"/></g></svg>ハンマー大<div class="pw"><i class="on"></i><i class="on"></i><i class="on"></i></div></button>
+      <button class="tool" data-tool="d1"><svg viewBox="0 0 40 40"><g transform="translate(20 20) scale(0.8) translate(-20 -20)"><rect x="5" y="14" width="17" height="12" rx="4" fill="#c4502f" stroke="#5a2414" stroke-width="1.6"/><rect x="21" y="16" width="6" height="8" fill="#7d858c" stroke="#3b4248" stroke-width="1.4"/><path d="M27 18.5 L37 20 L27 21.5 z" fill="#c9d0d6" stroke="#3b4248" stroke-width="1.2"/><path d="M8 26 L10 34 H16 L15 26" fill="#8f3a22"/></g></svg>ドリル弱<div class="pw"><i class="on"></i><i></i><i></i></div></button>
+      <button class="tool" data-tool="d2"><svg viewBox="0 0 40 40"><g transform="translate(20 20) scale(0.9) translate(-20 -20)"><rect x="5" y="14" width="17" height="12" rx="4" fill="#c4502f" stroke="#5a2414" stroke-width="1.6"/><rect x="21" y="16" width="6" height="8" fill="#7d858c" stroke="#3b4248" stroke-width="1.4"/><path d="M27 17 L37 20 L27 23 z" fill="#c9d0d6" stroke="#3b4248" stroke-width="1.2"/><path d="M8 26 L10 34 H16 L15 26" fill="#8f3a22"/></g></svg>ドリル中<div class="pw"><i class="on"></i><i class="on"></i><i></i></div></button>
+      <button class="tool" data-tool="d3"><svg viewBox="0 0 40 40"><g transform="translate(20 20) scale(1.0) translate(-20 -20)"><rect x="5" y="14" width="17" height="12" rx="4" fill="#c4502f" stroke="#5a2414" stroke-width="1.6"/><rect x="21" y="16" width="6" height="8" fill="#7d858c" stroke="#3b4248" stroke-width="1.4"/><path d="M27 15.5 L37 20 L27 24.5 z" fill="#c9d0d6" stroke="#3b4248" stroke-width="1.2"/><path d="M8 26 L10 34 H16 L15 26" fill="#8f3a22"/></g></svg>ドリル強<div class="pw"><i class="on"></i><i class="on"></i><i class="on"></i></div></button>
     </div>
     <button class="btn-end" onclick="finish('manual')">ここで終える</button>
   </section>
@@ -249,8 +251,8 @@ button:active{transform:scale(.96)}
   <div class="overlay" id="howto">
     <div class="modal">
       <h3>あそびかた</h3>
-      <div class="how"><div class="ic"><svg viewBox="0 0 40 40"><rect x="6" y="7" width="22" height="11" rx="2.5" transform="rotate(38 17 12.5)" fill="#9aa3ab"/><path d="M21 17 L33 33" stroke="#b37a45" stroke-width="4" stroke-linecap="round"/></svg></div><div><b>ハンマー</b>はタップ。岩をまとめて砕けるが、化石に当たると大ダメージ。黒っぽい<b>硬い岩</b>はハンマーで崩そう</div></div>
-      <div class="how"><div class="ic"><svg viewBox="0 0 40 40"><rect x="5" y="14" width="17" height="12" rx="4" fill="#c4502f"/><path d="M22 16 L37 20 L22 24z" fill="#c9d0d6"/></svg></div><div><b>ドリル</b>はなぞって削る。●が少ないほど遅いけど安全。仕上げは●1つで</div></div>
+      <div class="how"><div class="ic"><svg viewBox="0 0 40 40"><rect x="6" y="7" width="22" height="11" rx="2.5" transform="rotate(38 17 12.5)" fill="#9aa3ab"/><path d="M21 17 L33 33" stroke="#b37a45" stroke-width="4" stroke-linecap="round"/></svg></div><div><b>ハンマー</b>はタップ。大きいほど広く深く砕けるが、化石に当たると大ダメージ。黒っぽい<b>硬い岩</b>はハンマーで崩そう</div></div>
+      <div class="how"><div class="ic"><svg viewBox="0 0 40 40"><rect x="5" y="14" width="17" height="12" rx="4" fill="#c4502f"/><path d="M22 16 L37 20 L22 24z" fill="#c9d0d6"/></svg></div><div><b>ドリル</b>はなぞって削る。弱いほど遅いけど安全。スマホでは<b>指の少し上</b>を削るので、照準を見ながら仕上げよう</div></div>
       <div class="how"><div class="ic"><svg viewBox="0 0 40 40"><path d="M8 26c4-10 10-14 24-14" stroke="#efe2c4" stroke-width="7" stroke-linecap="round" fill="none"/><circle cx="24" cy="14" r="5" fill="#a45ee0"/></svg></div><div>化石を傷つけると<b style="color:#d9a8ff">紫</b>に変わる。耐久が0になると砕けて失敗</div></div>
       <div class="how"><div class="ic"><svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="13" fill="none" stroke="#f0b44c" stroke-width="3"/><path d="M20 12v8l5 4" stroke="#f0b44c" stroke-width="3" stroke-linecap="round" fill="none"/></svg></div><div>露出<b>60%以上</b>で成功(ゲージの赤い線)。全部出せたら高得点、傷が少ないほど点が上がる</div></div>
       <button class="btn-primary" onclick="sUI();hideHowto()">わかった</button>
@@ -280,19 +282,23 @@ const SPECIES=[
 ].map(([n,r])=>({n,r}));
 const PARTS=['頭','胴','腕','脚'];
 const RAR={
-  1:{dur:60,time:120,thick:1.25,hard:1,hint:'ごつごつした<br>ふつうの岩'},
-  2:{dur:46,time:105,thick:1.05,hard:2,hint:'うっすら<br>青く光っている'},
-  3:{dur:34,time:90,thick:0.85,hard:3,hint:'金色に<br>光っている…'},
-  4:{dur:24,time:75,thick:0.7,hard:5,hint:'脈打つように<br>光っている!?'}
+  1:{dur:60,time:135,thick:1.25,hard:1,hint:'ごつごつした<br>ふつうの岩'},
+  2:{dur:46,time:120,thick:1.05,hard:2,hint:'うっすら<br>青く光っている'},
+  3:{dur:34,time:100,thick:0.85,hard:3,hint:'金色に<br>光っている…'},
+  4:{dur:24,time:85,thick:0.7,hard:5,hint:'脈打つように<br>光っている!?'}
 };
+// 道具(盤面のマス単位)。dmg=化石に余った力が当たったときのダメージ係数
 const TOOLS={
-  hammer:{r:5.3,pow:3.2,dmg:0.155},
-  d1:{r:1.8,rate:10,dmg:0.0015},
-  d2:{r:3.0,rate:18,dmg:0.006},
-  d3:{r:4.1,rate:30,dmg:0.023}
+  h1:{r:4.5,pow:1.6,dmg:0.069,lv:1},
+  h2:{r:6.5,pow:2.4,dmg:0.069,lv:2},
+  h3:{r:8.5,pow:3.2,dmg:0.069,lv:3},
+  d1:{r:1.6,rate:10,dmg:0.00067},
+  d2:{r:3.2,rate:18,dmg:0.0027},
+  d3:{r:5.0,rate:30,dmg:0.0102}
 };
+const isHammer=t=>t[0]==='h';
 const PASS=0.6;
-const SIM=96, NS=SIM*SIM, D=SIM*4, ND=D*D, FMARGIN=0.14;
+const SIM=144, SC=3, GS=SIM/96, NS=SIM*SIM, D=SIM*SC, ND=D*D, FMARGIN=0.14, DMGFULL=0.2;
 
 // ================= 保存 =================
 let dexData={},settings={snd:true,seen:false};
@@ -427,8 +433,8 @@ function tn(o){if(!SND.ctx)return;const c=SND.ctx,t=c.currentTime+(o.at||0);
   const g=c.createGain();env(g,t,o.a||0.005,o.g||0.3,o.dur);s.connect(g);g.connect(SND.master);s.start(t);s.stop(t+o.dur+0.1)}
 const vr=()=>0.9+Math.random()*0.2;
 function sUI(){audioInit();tn({f:660,f2:520,dur:0.06,g:0.12,type:'triangle'})}
-function sHammer(){const v=vr();nz({f:1100*v,f2:250,dur:0.2,g:0.75});tn({f:120*v,f2:50,dur:0.16,g:0.55});nz({type:'highpass',f:3500,dur:0.03,g:0.25})}
-function sHard(){const v=vr();nz({type:'bandpass',f:2600*v,q:2,dur:0.14,g:0.6});nz({f:700,f2:200,dur:0.32,g:0.6});tn({f:190*v,f2:80,dur:0.18,g:0.25,type:'square'});nz({type:'highpass',f:5000,dur:0.02,g:0.4,at:0.04})}
+function sHammer(lv){lv=lv||3;const v=vr()*(1.5-lv*0.17),gg=0.35+lv*0.15;nz({f:1300*v,f2:280*v,dur:0.08+lv*0.04,g:gg});tn({f:150*v,f2:60*v,dur:0.08+lv*0.03,g:gg*0.75});nz({type:'highpass',f:3500,dur:0.03,g:0.2})}
+function sHard(lv){lv=lv||3;const v=vr()*(1.4-lv*0.13);nz({type:'bandpass',f:2600*v,q:2,dur:0.14,g:0.6});nz({f:700,f2:200,dur:0.32,g:0.6});tn({f:190*v,f2:80,dur:0.18,g:0.25,type:'square'});nz({type:'highpass',f:5000,dur:0.02,g:0.4,at:0.04})}
 function sFossil(){tn({f:240,f2:170,dur:0.28,g:0.28,type:'triangle'});tn({f:254,f2:180,dur:0.28,g:0.18,type:'triangle'});nz({f:500,dur:0.12,g:0.3})}
 function sDing(k){const f=[880,1046.5,1318.5][k]||1318.5;tn({f,dur:1.1,g:0.22});tn({f:f*2.76,dur:0.5,g:0.05});tn({f:f*1.5,dur:0.8,g:0.06,at:0.06})}
 function sReveal(){[1318.5,1760,2093,2637].forEach((f,i)=>tn({f,dur:0.35,g:0.12,at:i*0.055}))}
@@ -569,7 +575,7 @@ function toSelect(){
 
 // ================= ディスプレイ用の固定テクスチャ =================
 const BI0=new Int32Array(D),BI1=new Int32Array(D),BF=new Float32Array(D);
-for(let x=0;x<D;x++){let u=(x+0.5)/4-0.5;if(u<0)u=0;if(u>SIM-1)u=SIM-1;const i=Math.floor(u);BI0[x]=i;BI1[x]=Math.min(SIM-1,i+1);BF[x]=u-i}
+for(let x=0;x<D;x++){let u=(x+0.5)/SC-0.5;if(u<0)u=0;if(u>SIM-1)u=SIM-1;const i=Math.floor(u);BI0[x]=i;BI1[x]=Math.min(SIM-1,i+1);BF[x]=u-i}
 const TX=(()=>{
   const a=lattice(D,D,6,6),b=lattice(D,D,3,3),c=lattice(D,D,1.5,1.5),str=lattice(D,D,48,5),str2=lattice(D,D,20,2.5);
   const DN=new Float32Array(ND),DNX=new Float32Array(ND),DNY=new Float32Array(ND),STR=new Float32Array(ND),SPK=new Float32Array(ND),SP=new Uint8Array(ND),JX=new Int8Array(ND),JY=new Int8Array(ND);
@@ -594,14 +600,14 @@ function startClean(rock){
   const soil=new Float32Array(NS),rockL=new Float32Array(NS),hard=new Float32Array(NS),cov=new Float32Array(NS),cellDmg=new Float32Array(NS),
         fossil=new Uint8Array(NS),inRock=new Uint8Array(NS),jit=new Float32Array(NS),hardInit=new Float32Array(NS);
   const fossilIdx=[];
-  for(let sy=0;sy<SIM;sy++)for(let sx=0;sx<SIM;sx++){const i=sy*SIM+sx;const dm=domeHi[(sy*4+2)*D+sx*4+2];if(dm>0){fossil[i]=1;fossilIdx.push(i)}jit[i]=rnd()*2-1}
+  for(let sy=0;sy<SIM;sy++)for(let sx=0;sx<SIM;sx++){const i=sy*SIM+sx;const dm=domeHi[(sy*SC+1)*D+sx*SC+1];if(dm>0){fossil[i]=1;fossilIdx.push(i)}jit[i]=rnd()*2-1}
   // 岩の輪郭(不定形、化石は必ず中に入る)
   const BINS=90,cxy=SIM/2,maxd=new Float32Array(BINS),ph=[rnd()*6,rnd()*6,rnd()*6];
   for(const i of fossilIdx){const dx=i%SIM+0.5-cxy,dy=(i/SIM|0)+0.5-cxy,b=Math.floor((Math.atan2(dy,dx)+Math.PI)/(2*Math.PI)*BINS)%BINS;maxd[b]=Math.max(maxd[b],Math.hypot(dx,dy))}
   let br=new Float32Array(BINS);
-  for(let b=0;b<BINS;b++){const a=b/BINS*2*Math.PI-Math.PI;br[b]=Math.max(SIM*0.44*(1+0.07*Math.sin(3*a+ph[0])+0.05*Math.sin(5*a+ph[1])+0.03*Math.sin(9*a+ph[2])),maxd[b]+4)}
+  for(let b=0;b<BINS;b++){const a=b/BINS*2*Math.PI-Math.PI;br[b]=Math.max(SIM*0.44*(1+0.07*Math.sin(3*a+ph[0])+0.05*Math.sin(5*a+ph[1])+0.03*Math.sin(9*a+ph[2])),maxd[b]+4*GS)}
   for(let k=0;k<3;k++){const nb=new Float32Array(BINS);for(let b=0;b<BINS;b++)nb[b]=(br[(b+BINS-1)%BINS]+2*br[b]+br[(b+1)%BINS])/4;br=nb}
-  for(let b=0;b<BINS;b++)br[b]=Math.min(SIM*0.495,Math.max(br[b],maxd[b]+3));
+  for(let b=0;b<BINS;b++)br[b]=Math.min(SIM*0.495,Math.max(br[b],maxd[b]+3*GS));
   const n1=lattice(SIM,SIM,SIM/5,SIM/5),n2=lattice(SIM,SIM,SIM/4,SIM/4);
   for(let sy=0;sy<SIM;sy++)for(let sx=0;sx<SIM;sx++){const i=sy*SIM+sx,dx=sx+0.5-cxy,dy=sy+0.5-cxy;
     const fb=(Math.atan2(dy,dx)+Math.PI)/(2*Math.PI)*BINS,b0=Math.floor(fb)%BINS,b1=(b0+1)%BINS,t=fb-Math.floor(fb),rad=br[b0]*(1-t)+br[b1]*t;
@@ -609,16 +615,16 @@ function startClean(rock){
     const dome=Math.sqrt(Math.max(0,1-rr*rr)),edge=Math.min(1,(1-rr)/0.14),e2=edge*edge*(3-2*edge);
     soil[i]=(0.45+n1[i]*0.55)*Math.min(1,dome*2.2)*e2;
     rockL[i]=Math.max(0.06,(0.25+2.1*dome+(n2[i]-0.5)*0.8)*e2);
-    if(fossil[i]){const dm=domeHi[(sy*4+2)*D+sx*4+2];rockL[i]=Math.max(0.25,rockL[i]-dm*0.9)}
+    if(fossil[i]){const dm=domeHi[(sy*SC+1)*D+sx*SC+1];rockL[i]=Math.max(0.25,rockL[i]-dm*0.9)}
   }
   // 硬い岩(化石の近く)
   for(let k=0;k<R.hard;k++){const base=fossilIdx[Math.floor(rnd()*fossilIdx.length)];
-    const cx=base%SIM+(rnd()*10-5),cy=Math.floor(base/SIM)+(rnd()*10-5),rad=5+rnd()*5;
+    const cx=base%SIM+(rnd()*10-5)*GS,cy=Math.floor(base/SIM)+(rnd()*10-5)*GS,rad=(5+rnd()*5)*GS;
     for(let y=Math.max(0,Math.floor(cy-rad));y<Math.min(SIM,cy+rad+1);y++)for(let x=Math.max(0,Math.floor(cx-rad));x<Math.min(SIM,cx+rad+1);x++){
       const i=y*SIM+x;if(!inRock[i])continue;if(Math.hypot(x-cx,y-cy)+jit[i]*1.2<rad){hard[i]=3;hardInit[i]=3}}}
   for(let i=0;i<NS;i++)cov[i]=soil[i]+rockL[i]+hard[i];
   // 割れる塊(ボロノイ)
-  const seeds=[];const SP4=4;
+  const seeds=[];const SP4=3;
   for(let y=0;y<SIM;y+=SP4)for(let x=0;x<SIM;x+=SP4)seeds.push([x+rnd()*SP4,y+rnd()*SP4]);
   const gw=Math.ceil(SIM/SP4),chunk=new Int32Array(NS);
   for(let y=0;y<SIM;y++)for(let x=0;x<SIM;x++){const gx=Math.floor(x/SP4),gy=Math.floor(y/SP4);let best=1e9,bi=0;
@@ -635,13 +641,13 @@ function startClean(rock){
   for(let y=1;y<D-1;y++)for(let x=1;x<D-1;x++){const p=y*D+x;PBX[p]=PEB[p+1]-PEB[p-1];PBY[p]=PEB[p+D]-PEB[p-D]}
   // ヒビ
   const cracks=[];
-  for(let k=0;k<6;k++){const st=fossilIdx[Math.floor(rnd()*fossilIdx.length)];let x=(st%SIM)*4+2,y=Math.floor(st/SIM)*4+2,a=rnd()*Math.PI*2;const pts=[[x,y]];
+  for(let k=0;k<6;k++){const st=fossilIdx[Math.floor(rnd()*fossilIdx.length)];let x=(st%SIM)*SC+1,y=Math.floor(st/SIM)*SC+1,a=rnd()*Math.PI*2;const pts=[[x,y]];
     for(let j=0;j<8;j++){a+=rnd()*1.2-0.6;x+=Math.cos(a)*9;y+=Math.sin(a)*9;pts.push([x,y])}cracks.push(pts)}
   // 化石マスク(光の演出用)
   const mk=document.createElement('canvas');mk.width=mk.height=D;const mc=mk.getContext('2d'),mi=mc.createImageData(D,D);
   for(let p=0;p<ND;p++)if(domeHi[p]>0){mi.data[p*4]=mi.data[p*4+1]=mi.data[p*4+2]=255;mi.data[p*4+3]=255}mc.putImageData(mi,0,0);
   G={rock,R,shape,domeHi,soil,rockL,hard,hardInit,cov,cellDmg,fossil,fossilIdx,fossilCount:fossilIdx.length,inRock,jit,chunk,cStart,cList,seeds,
-     PEB,PBX,PBY,cracks,mask:mk,totalDmg:0,time:R.time,tool:G?G.tool:'hammer',down:false,px:-99,py:-99,over:false,seq:null,seqT:0,
+     PEB,PBX,PBY,cracks,mask:mk,totalDmg:0,time:R.time,tool:G?G.tool:'h2',down:false,px:-99,py:-99,ax:-99,ay:-99,lx:null,ly:null,touch:false,over:false,seq:null,seqT:0,
      parts:[],flashes:[],trauma:0,freeze:0,lastHammer:0,hudT:0,exp:0,ms:0,revealed:false,dirty:null,lastSec:99,crackT:0,dark:0,sweep:-1};
   document.querySelectorAll('.tool').forEach(b=>b.classList.toggle('sel',b.dataset.tool===G.tool));
   document.querySelectorAll('#expGauge i').forEach(i=>i.classList.remove('on'));
@@ -669,7 +675,7 @@ function renderRect(x0,y0,x1,y1){
       const p=y*D+x,c=COV[p],DNp=TX.DN[p];
       let gx=SURF[p+1]-SURF[p-1],gy=SURF[p+D]-SURF[p-D];
       let mat;
-      if(c>0.05+DNp*0.12){let sx=(x+JX[p])>>2,sy=(y+JY[p])>>2;sx=sx<0?0:sx>=SIM?SIM-1:sx;sy=sy<0?0:sy>=SIM?SIM-1:sy;const j=sy*SIM+sx;
+      if(c>0.05+DNp*0.12){let sx=((x+JX[p])/SC)|0,sy=((y+JY[p])/SC)|0;sx=sx<0?0:sx>=SIM?SIM-1:sx;sy=sy<0?0:sy>=SIM?SIM-1:sy;const j=sy*SIM+sx;
         mat=soil[j]>0.001?0:rockL[j]>0.001?1:hard[j]>0.001?2:1}
       else mat=dome[p]>0?3:4;
       const ro=ROUGH[mat];gx+=DNX[p]*ro;gy+=DNY[p]*ro;
@@ -686,13 +692,13 @@ function renderRect(x0,y0,x1,y1){
       r*=shade;g*=shade;b*=shade;
       if(mat===3){const sp=Math.pow(lit,14)*120;r+=sp;g+=sp;b+=sp;
         const i0=BI0[x],i1=BI1[x],fx=BF[x];const t0=(dmg[r0+i0]+(dmg[r0+i1]-dmg[r0+i0])*fx)*(1-fy)+(dmg[r1+i0]+(dmg[r1+i1]-dmg[r1+i0])*fx)*fy;
-        if(t0>0.004){const t=t0>=0.45?1:t0/0.45;[r,g,b]=tint(r,g,b,t,shade)}}
+        if(t0>0.002){const t=t0>=DMGFULL?1:t0/DMGFULL;[r,g,b]=tint(r,g,b,t,shade)}}
       else if(mat<3&&c<0.55&&dome[p]>0){const t=(1-c/0.55)*0.5;r+=(225*shade-r)*t;g+=(214*shade-g)*t;b+=(188*shade-b)*t}
       const o=p*4;d[o]=r;d[o+1]=g;d[o+2]=b;d[o+3]=255;
     }}
   octx.putImageData(img,0,0,x0,y0,x1-x0,y1-y0);
 }
-function markDirty(sx0,sy0,sx1,sy1){const x0=sx0*4-10,y0=sy0*4-10,x1=sx1*4+14,y1=sy1*4+14;
+function markDirty(sx0,sy0,sx1,sy1){const x0=sx0*SC-10,y0=sy0*SC-10,x1=sx1*SC+13,y1=sy1*SC+13;
   if(!G.dirty)G.dirty=[x0,y0,x1,y1];else{const q=G.dirty;q[0]=Math.min(q[0],x0);q[1]=Math.min(q[1],y0);q[2]=Math.max(q[2],x1);q[3]=Math.max(q[3],y1)}}
 
 // ---- 道具 ----
@@ -707,7 +713,7 @@ function applyPower(i,p,isDrill,dmgF){
   const nc=G.soil[i]+G.rockL[i]+G.hard[i];OP.total+=G.cov[i]-nc;G.cov[i]=nc<1e-5?0:nc;
 }
 function hammerAt(gx,gy){
-  const t=TOOLS.hammer,r=t.r;resetOP();const ids=new Set();
+  const t=TOOLS[G.tool],r=t.r,lv=t.lv;resetOP();const ids=new Set();
   const X0=Math.max(0,Math.floor(gx-r-3)),X1=Math.min(SIM-1,Math.ceil(gx+r+3)),Y0=Math.max(0,Math.floor(gy-r-3)),Y1=Math.min(SIM-1,Math.ceil(gy+r+3));
   for(let y=Y0;y<=Y1;y++)for(let x=X0;x<=X1;x++)if(Math.hypot(x+0.5-gx,y+0.5-gy)<r+1)ids.add(G.chunk[y*SIM+x]);
   let bx0=SIM,by0=SIM,bx1=0,by1=0;
@@ -715,16 +721,16 @@ function hammerAt(gx,gy){
     for(let k=G.cStart[id];k<G.cStart[id+1];k++){const i=G.cList[k];if(!G.inRock[i])continue;applyPower(i,pw,false,t.dmg);const x=i%SIM,y=i/SIM|0;
       if(x<bx0)bx0=x;if(x>bx1)bx1=x;if(y<by0)by0=y;if(y>by1)by1=y}}
   if(bx1>=bx0)markDirty(bx0,by0,bx1+1,by1+1);
-  const X=gx*4,Y=gy*4;
+  const X=gx*SC,Y=gy*SC,big=0.6+lv*0.2;
   if(OP.total>0.01||OP.dmg>0){
-    const isHard=OP.hard>2.5;
-    if(isHard){sHard();G.freeze=0.06;addTrauma(0.5);addFlash(X,Y,70,'255,255,255',0.12);spawnShards(X,Y,'hard',22,1.4);buzz(25)}
-    else{sHammer();G.freeze=0.035;addTrauma(0.32);addFlash(X,Y,50,'255,240,215',0.09);buzz(12)}
+    const isHard=OP.hard>2.5*GS*GS*lv/3;
+    if(isHard){sHard(lv);G.freeze=0.03+lv*0.01;addTrauma(0.2+lv*0.1);addFlash(X,Y,30+lv*14,'255,255,255',0.12);spawnShards(X,Y,'hard',8+lv*5,big*1.2);buzz(15+lv*4)}
+    else{sHammer(lv);G.freeze=0.015+lv*0.007;addTrauma(0.1+lv*0.08);addFlash(X,Y,22+lv*10,'255,240,215',0.09);buzz(6+lv*3)}
     const tot=OP.soil+OP.rock+OP.hard||1;
-    spawnShards(X,Y,'soil',Math.round(14*OP.soil/tot),1);spawnShards(X,Y,'rock',Math.round(14*OP.rock/tot),1.1);if(!isHard)spawnShards(X,Y,'hard',Math.round(10*OP.hard/tot),1.2);
-    spawnDust(X,Y,OP.soil>OP.rock?'soil':'rock',6);
+    const ns=4+lv*4;spawnShards(X,Y,'soil',Math.round(ns*OP.soil/tot),big);spawnShards(X,Y,'rock',Math.round(ns*OP.rock/tot),big*1.1);if(!isHard)spawnShards(X,Y,'hard',Math.round(ns*0.7*OP.hard/tot),big*1.2);
+    spawnDust(X,Y,OP.soil>OP.rock?'soil':'rock',lv*2);
   }else{nz({f:900,f2:300,dur:0.08,g:0.25})}
-  if(OP.dmg>0.4)fossilHitFx(X,Y,OP.dmg);
+  if(OP.dmg>0.18)fossilHitFx(X,Y,OP.dmg*2.25);
 }
 function drillAt(gx,gy,dt){
   const t=TOOLS[G.tool],r=t.r;resetOP();
@@ -732,13 +738,13 @@ function drillAt(gx,gy,dt){
   for(let y=Y0;y<=Y1;y++)for(let x=X0;x<=X1;x++){const i=y*SIM+x;if(!G.inRock[i])continue;const d=Math.hypot(x+0.5-gx,y+0.5-gy)+G.jit[i]*0.6;if(d>r)continue;
     applyPower(i,t.rate*dt*(1-0.5*(d/r)*(d/r)),true,t.dmg)}
   markDirty(X0,Y0,X1+1,Y1+1);
-  const X=gx*4,Y=gy*4;
+  const X=gx*SC,Y=gy*SC;
   if(OP.total>0.002){const m=OP.hard>OP.rock&&OP.hard>OP.soil?'hard':OP.rock>OP.soil?'rock':'soil';
     if(rnd()<({d1:0.35,d2:0.6,d3:0.9})[G.tool])spawnGrit(X,Y,m,G.tool==='d3'?3:1);
     if(G.tool==='d3'&&rnd()<0.15)spawnDust(X,Y,m,1);
     if(G.tool==='d3')addTrauma(0.03)}
-  if(OP.dmg>0.0005){if(rnd()<0.5)spawnSpark(X,Y,2);if(OP.dmg>0.02&&rnd()<0.3)document.getElementById('gauge').classList.add('hit')}
-  drillLevel(OP.total/dt,OP.dmg/dt*0.05);
+  if(OP.dmg>0.0002){if(rnd()<0.5)spawnSpark(X,Y,2);if(OP.dmg>0.009&&rnd()<0.3)document.getElementById('gauge').classList.add('hit')}
+  return OP;
 }
 
 // ---- 演出パーツ ----
@@ -760,15 +766,25 @@ function floatText(x,y,txt,cls){const el=document.createElement('div');el.classN
 
 // ---- 入力 ----
 document.querySelectorAll('.tool').forEach(b=>b.onclick=()=>{if(!G)return;G.tool=b.dataset.tool;sUI();
-  document.querySelectorAll('.tool').forEach(x=>x.classList.toggle('sel',x===b));if(G.down&&G.tool!=='hammer')drillOn(G.tool);else drillOff()});
-function toGrid(ev){const r=board.getBoundingClientRect();return[(ev.clientX-r.left)/r.width*SIM,(ev.clientY-r.top)/r.height*SIM]}
+  document.querySelectorAll('.tool').forEach(x=>x.classList.toggle('sel',x===b));if(G.down&&!isHammer(G.tool)){G.lx=G.ax;G.ly=G.ay;drillOn(G.tool)}else drillOff()});
+// タッチでドリルを使うときは、指で隠れないように少し上を削る
+const TOUCH_OFF=34;
+function toGrid(ev){const r=board.getBoundingClientRect();return[(ev.clientX-r.left)/r.width*SIM,(ev.clientY-r.top)/r.height*SIM,SIM/r.height]}
+function setAim(ev){const [x,y,k]=toGrid(ev);G.px=x;G.py=y;G.touch=ev.pointerType==='touch';G.ax=x;G.ay=(G.touch&&!isHammer(G.tool))?y-TOUCH_OFF*k:y}
 board.addEventListener('pointerdown',ev=>{if(!G||G.over)return;ev.preventDefault();try{board.setPointerCapture(ev.pointerId)}catch(e){}
-  [G.px,G.py]=toGrid(ev);G.down=true;
-  if(G.tool==='hammer'){const now=performance.now();if(now-G.lastHammer>110){G.lastHammer=now;hammerAt(G.px,G.py)}}else drillOn(G.tool)});
-board.addEventListener('pointermove',ev=>{if(!G)return;[G.px,G.py]=toGrid(ev)});
+  setAim(ev);G.down=true;G.lx=G.ax;G.ly=G.ay;
+  if(isHammer(G.tool)){const now=performance.now();if(now-G.lastHammer>90){G.lastHammer=now;hammerAt(G.ax,G.ay)}}else drillOn(G.tool)});
+board.addEventListener('pointermove',ev=>{if(!G)return;setAim(ev)});
+// 前フレームの位置から今の位置まで、途切れずに削る
+function drillStroke(dt){
+  const t=TOOLS[G.tool],x0=G.lx??G.ax,y0=G.ly??G.ay,dx=G.ax-x0,dy=G.ay-y0,dist=Math.hypot(dx,dy);
+  const n=Math.max(1,Math.ceil(dist/Math.max(0.6,t.r*0.4)));let tot=0,dm=0;
+  for(let k=1;k<=n;k++){const o=drillAt(x0+dx*k/n,y0+dy*k/n,dt/n);tot+=o.total;dm+=o.dmg}
+  G.lx=G.ax;G.ly=G.ay;drillLevel(tot/dt,dm/dt*0.11);
+}
 const up=()=>{if(G){G.down=false;drillOff()}};
 board.addEventListener('pointerup',up);board.addEventListener('pointercancel',up);
-board.addEventListener('pointerleave',ev=>{if(G&&ev.pointerType==='mouse'){G.down=false;G.px=-99;drillOff()}});
+board.addEventListener('pointerleave',ev=>{if(G&&ev.pointerType==='mouse'){G.down=false;G.px=-99;G.ax=-99;drillOff()}});
 
 // ---- HUD ----
 function exposure(){let e=0;for(const i of G.fossilIdx)if(G.cov[i]<=0.001)e++;return G.fossilCount?e/G.fossilCount:0}
@@ -782,7 +798,7 @@ function updateHud(){
 }
 function checkMilestones(){
   if(!G.revealed&&G.exp>0){G.revealed=true;sReveal();let best=null;for(const i of G.fossilIdx)if(G.cov[i]<=0.001){best=i;break}
-    if(best!==null){const x=(best%SIM)*4+2,y=Math.floor(best/SIM)*4+2;spawnTwinkle(x,y,8,30);addFlash(x,y,40,'255,240,200',0.3);floatText(x,y-28,'化石が見えた!')}}
+    if(best!==null){const x=(best%SIM)*SC+1,y=Math.floor(best/SIM)*SC+1;spawnTwinkle(x,y,8,30);addFlash(x,y,40,'255,240,200',0.3);floatText(x,y-28,'化石が見えた!')}}
   const th=[0.25,0.5,0.75];
   while(G.ms<3&&G.exp>=th[G.ms]){sDing(G.ms);document.querySelectorAll('#expGauge i')[G.ms].classList.add('on');floatText(D/2,D*0.88,Math.round(th[G.ms]*100)+'%!');G.ms++}
 }
@@ -825,9 +841,12 @@ function drawBoard(dt){
       ctx.beginPath();ctx.moveTo(p.x*s,p.y*s-z);ctx.quadraticCurveTo(p.x*s,p.y*s,p.x*s+z,p.y*s);ctx.quadraticCurveTo(p.x*s,p.y*s,p.x*s,p.y*s+z);ctx.quadraticCurveTo(p.x*s,p.y*s,p.x*s-z,p.y*s);ctx.quadraticCurveTo(p.x*s,p.y*s,p.x*s,p.y*s-z);ctx.fill()}}
   ctx.globalAlpha=1;
   // 道具の範囲
-  if(!G.over&&G.px>=0&&G.px<=SIM&&G.py>=0&&G.py<=SIM){const r=TOOLS[G.tool].r*4*s;
-    ctx.strokeStyle=G.tool==='hammer'?'rgba(255,214,130,.85)':'rgba(255,255,255,.75)';ctx.lineWidth=2;ctx.setLineDash(G.tool==='hammer'?[]:[5,4]);
-    ctx.beginPath();ctx.arc(G.px*4*s,G.py*4*s,r,0,Math.PI*2);ctx.stroke();ctx.setLineDash([])}
+  if(!G.over&&G.ax>=0&&G.ax<=SIM&&G.ay>=-2&&G.ay<=SIM&&(G.down||!G.touch)){const r=TOOLS[G.tool].r*SC*s,hm=isHammer(G.tool),ax=G.ax*SC*s,ay=G.ay*SC*s;
+    if(G.touch&&!hm){ctx.strokeStyle='rgba(255,255,255,.35)';ctx.lineWidth=1.5;ctx.setLineDash([3,4]);ctx.beginPath();ctx.moveTo(G.px*SC*s,G.py*SC*s);ctx.lineTo(ax,ay+r);ctx.stroke()}
+    ctx.strokeStyle='rgba(0,0,0,.5)';ctx.lineWidth=4;ctx.setLineDash([]);ctx.beginPath();ctx.arc(ax,ay,r,0,Math.PI*2);ctx.stroke();
+    ctx.strokeStyle=hm?'rgba(255,214,130,.95)':'rgba(255,255,255,.9)';ctx.lineWidth=2;ctx.setLineDash(hm?[]:[5,4]);
+    ctx.beginPath();ctx.arc(ax,ay,r,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);
+    if(!hm){ctx.fillStyle='rgba(255,255,255,.95)';ctx.beginPath();ctx.arc(ax,ay,Math.max(1.5,s*1.2),0,7);ctx.fill()}}
 }
 function updateParts(dt){
   for(const p of G.parts){p.life-=dt;p.x+=p.vx*dt;p.y+=p.vy*dt;
@@ -848,7 +867,7 @@ function runSeq(dt){
   if(G.seq==='clear'){
     if(t<0.7){const rad=t/0.7*SIM*0.75;let any=false;
       for(let i=0;i<NS;i++){if(G.cov[i]<=0||!G.inRock[i])continue;const x=i%SIM,y=i/SIM|0;if(Math.hypot(x-SIM/2,y-SIM/2)<rad){
-        if(rnd()<0.04)spawnShards(x*4,y*4,G.rockL[i]>0?'rock':'soil',1,0.7);G.soil[i]=G.rockL[i]=G.hard[i]=0;G.cov[i]=0;any=true}}
+        if(rnd()<0.04)spawnShards(x*SC,y*SC,G.rockL[i]>0?'rock':'soil',1,0.7);G.soil[i]=G.rockL[i]=G.hard[i]=0;G.cov[i]=0;any=true}}
       if(any)G.dirty=[0,0,D,D];
     }else if(G.sweep<0&&t<1.6){G.sweep=0;updateHud();spawnTwinkle(D/2,D/2,24,D*0.6);floatText(D/2,D*0.18,'完全発掘!')}
     if(G.sweep>=0)G.sweep=Math.min(1.2,(t-0.7)/0.9);
@@ -856,7 +875,7 @@ function runSeq(dt){
   }else if(G.seq==='break'){
     G.crackT+=dt;
     if(t>0.35&&!G.burst){G.burst=true;addTrauma(1);
-      for(let k=0;k<70;k++){const i=G.fossilIdx[Math.floor(rnd()*G.fossilIdx.length)];spawnShards((i%SIM)*4+2,Math.floor(i/SIM)*4+2,'fossil',1,1.3)}
+      for(let k=0;k<70;k++){const i=G.fossilIdx[Math.floor(rnd()*G.fossilIdx.length)];spawnShards((i%SIM)*SC+1,Math.floor(i/SIM)*SC+1,'fossil',1,1.3)}
       spawnSpark(D/2,D/2,30);addFlash(D/2,D/2,D*0.5,'170,80,240',0.4)}
     G.dark=Math.min(0.55,Math.max(0,(t-0.35)*0.9));
     if(t>1.5){G.seq=null;showResult()}
@@ -884,7 +903,7 @@ function showResult(){
   stamp.className='stamp';badge.innerHTML='';document.getElementById('rScore').textContent='0';
   // 化石の絵
   const dm=G.cellDmg;const fc=renderFossil(G.domeHi,D,FMARGIN,(x,y)=>{const r0=BI0[y]*SIM,r1=BI1[y]*SIM,i0=BI0[x],i1=BI1[x],fx=BF[x],fy=BF[y];
-    const t=(dm[r0+i0]+(dm[r0+i1]-dm[r0+i0])*fx)*(1-fy)+(dm[r1+i0]+(dm[r1+i1]-dm[r1+i0])*fx)*fy;return t>0.004?Math.min(1,t/0.45):0});
+    const t=(dm[r0+i0]+(dm[r0+i1]-dm[r0+i0])*fx)*(1-fy)+(dm[r1+i0]+(dm[r1+i1]-dm[r1+i0])*fx)*fy;return t>0.002?Math.min(1,t/DMGFULL):0});
   let bx0=D,by0=D,bx1=0,by1=0;for(let y=0;y<D;y++)for(let x=0;x<D;x++)if(G.domeHi[y*D+x]>0){if(x<bx0)bx0=x;if(x>bx1)bx1=x;if(y<by0)by0=y;if(y>by1)by1=y}
   const rc=document.getElementById('resultCanvas');show('result');
   const dpr=Math.min(2,devicePixelRatio||1);rc.width=rc.clientWidth*dpr;rc.height=rc.clientHeight*dpr;const c2=rc.getContext('2d');
@@ -953,7 +972,7 @@ function loop(now){
     else{
       if(!G.over){
         G.time-=dt;
-        if(G.down&&G.tool!=='hammer')drillAt(G.px,G.py,dt);
+        if(G.down&&!isHammer(G.tool))drillStroke(dt);
         if(G.totalDmg>=G.R.dur){G.totalDmg=G.R.dur;finish('broken')}
         else if(G.time<=0){G.time=0;finish('time')}
         else{G.hudT-=dt;if(G.hudT<=0){G.hudT=0.08;updateHud();checkMilestones();if(G.exp>=0.999)finish('clear')}
